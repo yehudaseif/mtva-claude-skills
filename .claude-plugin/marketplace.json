@@ -1,0 +1,35 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mtva-skills",
+  "version": "0.1.0",
+  "description": "House Claude Code skills for MTVA admin staff — attendance analysis and student-facing PDF reports, video footage transcription and indexing, and classroom material generation.",
+  "owner": {
+    "name": "MTVA"
+  },
+  "plugins": [
+    {
+      "name": "student-reports",
+      "description": "Turn attendance, grade, or roster spreadsheets into analysis and per-student PDF reports. Reads .xlsx/.csv, computes rates and flags, and renders one letterheaded PDF per student via Typst. Use for attendance letters, progress reports, and any batch of parent-facing documents driven by a spreadsheet.",
+      "version": "0.1.0",
+      "author": { "name": "MTVA" },
+      "source": "./plugins/student-reports",
+      "category": "productivity"
+    },
+    {
+      "name": "footage-review",
+      "description": "Review video footage without scrubbing timelines. Transcribes a folder of clips locally with ffmpeg and Whisper, builds a timestamped searchable index, flags clips where student names are spoken, and cuts clips and stills by timestamp.",
+      "version": "0.1.0",
+      "author": { "name": "MTVA" },
+      "source": "./plugins/footage-review",
+      "category": "productivity"
+    },
+    {
+      "name": "classroom-materials",
+      "description": "Turn a source text into classroom-ready material — worksheets with answer keys, differentiated reading-level variants, vocabulary sets, and quizzes — as Word documents teachers can edit.",
+      "version": "0.1.0",
+      "author": { "name": "MTVA" },
+      "source": "./plugins/classroom-materials",
+      "category": "productivity"
+    }
+  ]
+}

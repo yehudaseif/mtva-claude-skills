@@ -1,0 +1,10 @@
+# One term per line. Names, places, program vocabulary — the proper nouns
+# Whisper would otherwise guess at. Keep it under ~40 lines; the prompt is
+# capped and a longer list silently truncates.
+# Replace these examples with your own.
+Kevutza Aleph
+madrich
+madricha
+chanich
+tiyul
+shiur

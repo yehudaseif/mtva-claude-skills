@@ -1,0 +1,6 @@
+{
+  "name": "student-reports",
+  "description": "Attendance and grade spreadsheets into analysis and per-student PDF reports, rendered with Typst.",
+  "version": "0.1.0",
+  "author": { "name": "MTVA" }
+}
