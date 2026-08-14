@@ -42,15 +42,27 @@ Includes a debugged Typst report template with a native bar chart — edit
 **Needs:** `brew install typst`
 
 ### `footage-review`
-Turns a folder of clips into a searchable timestamped index. Transcribes
-locally with ffmpeg and Whisper — footage never leaves the machine — flags
-clips where student names are spoken, and cuts clips and stills by timestamp.
+Two skills. Everything runs locally — footage never leaves the machine.
 
-The index file is the real deliverable. You stop scrubbing timelines and start
-searching text.
+**`face-roster`** answers "who is in this clip?". Enrol students from a few
+reference photos each, then get a per-clip roster with timestamps and a
+confidence mark on every row. Faces that match nobody are reported as unknown
+and never snapped to the nearest name — attaching the wrong student's name to
+footage is the failure that causes real harm, so the pipeline says "I don't
+know" instead of guessing.
 
-**Needs:** `brew install ffmpeg uv`. First run downloads Whisper weights (~460 MB,
-cached after that).
+The enrolled database is biometric data about minors. Keep it on one machine,
+don't sync it, and delete it at the end of the program year. Check that your
+photo-release form actually covers biometric processing — a general release
+often doesn't, and that's a form change rather than a code change.
+
+**`footage-index`** transcribes the audio and builds a timestamped index of
+what happens. Run both and join on filename: faces say *who*, the transcript
+says *what*, and together you can find "the clip where Sara is being
+interviewed".
+
+**Needs:** `brew install ffmpeg uv`. First runs download the face model
+(~300 MB) and Whisper weights (~460 MB), both cached after that.
 
 ### `classroom-materials`
 A source text into worksheets, answer keys, differentiated reading-level

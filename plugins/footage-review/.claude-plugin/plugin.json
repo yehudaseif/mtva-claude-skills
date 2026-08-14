@@ -1,6 +1,8 @@
 {
   "name": "footage-review",
-  "description": "Local transcription and timestamped indexing of video footage, plus clip and still extraction.",
-  "version": "0.1.0",
-  "author": { "name": "MTVA" }
+  "description": "Face-based per-clip rosters plus local transcription and timestamped indexing of video footage.",
+  "version": "0.2.0",
+  "author": {
+    "name": "MTVA"
+  }
 }
