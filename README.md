@@ -22,8 +22,16 @@ claude plugin install classroom-materials@mtva-skills  # worksheets and answer k
 Restart Claude Code. There is nothing to configure — describe what you want in
 plain English and the right skill loads itself.
 
-To update later: `claude plugin update <name>`. To see what you have:
-`claude plugin list`.
+To update later, refresh the marketplace first, then the plugin — and note that
+`update` needs the full `name@marketplace` form; a bare name fails with
+"Plugin not found":
+
+```bash
+claude plugin marketplace update mtva-skills
+claude plugin update footage-review@mtva-skills
+```
+
+To see what you have: `claude plugin list`.
 
 ## What's in each
 
