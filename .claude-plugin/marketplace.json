@@ -1,12 +1,22 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mtva-skills",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "House Claude Code skills for MTVA admin staff — attendance analysis and student-facing PDF reports, video footage transcription and indexing, and classroom material generation.",
   "owner": {
     "name": "MTVA"
   },
   "plugins": [
+    {
+      "name": "office-toolkit",
+      "description": "Everyday school-office work: polished printable PDFs via Typst, the weekly notice sheet, reimbursement summaries for signature, letters to parents, inbox triage with drafted replies, and the weekly Constant Contact newsletter. Use for notice sheets, bulletins, expenses, receipts, parent letters, inbox catch-up, or the weekly parent email.",
+      "version": "0.1.0",
+      "author": {
+        "name": "MTVA"
+      },
+      "source": "./plugins/office-toolkit",
+      "category": "productivity"
+    },
     {
       "name": "student-reports",
       "description": "Turn attendance, grade, or roster spreadsheets into analysis and per-student PDF reports. Reads .xlsx/.csv, computes rates and flags, and renders one letterheaded PDF per student via Typst. Use for attendance letters, progress reports, and any batch of parent-facing documents driven by a spreadsheet.",

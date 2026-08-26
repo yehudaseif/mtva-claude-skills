@@ -1,0 +1,6 @@
+{
+  "name": "office-toolkit",
+  "description": "Everyday school-office work: polished PDFs via Typst, notice sheets and reimbursement summaries, inbox triage and drafting, and the weekly Constant Contact newsletter.",
+  "version": "0.1.0",
+  "author": { "name": "MTVA" }
+}
