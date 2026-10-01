@@ -1,0 +1,20 @@
+{
+  "drop_root": "~/Documents/TVA Newsletter",
+  "constant_contact": {
+    "client_id": "PASTE-API-KEY-FROM-CONSTANT-CONTACT-DEVELOPER-PORTAL",
+    "redirect_uri": "http://localhost:8765/callback"
+  },
+  "programs": {
+    "mtva": { "test_recipients": ["office@tvaisrael.org"] },
+    "ytva": { "test_recipients": ["office@tvaisrael.org"] }
+  },
+  "image_host": {
+    "type": "r2",
+    "account_id": "CLOUDFLARE-ACCOUNT-ID",
+    "bucket": "tva-newsletter",
+    "access_key_id": "R2-ACCESS-KEY-ID",
+    "secret_access_key": "R2-SECRET-ACCESS-KEY",
+    "public_base_url": "https://pub-XXXXXXXX.r2.dev",
+    "prefix": "newsletter"
+  }
+}

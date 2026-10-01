@@ -1,0 +1,101 @@
+{
+  "key": "mtva",
+  "short": "MTVA",
+  "name": "Midreshet Torah V'Avodah",
+  "subject": "Shabbat Shalom from MTVA - {parsha}",
+  "campaign_name": "MTVA Newsletter - {parsha} {hebrew_year} ({date})",
+  "colors": {
+    "page": "#262E67",
+    "frame": "#9E1F63",
+    "date_band": "#9E1F63",
+    "section_bar": "#F7BA3E",
+    "feature_bar": "#FFC043",
+    "text": "#262E67",
+    "footer_heading": "#FBB040",
+    "birthday_bg": "#262E67",
+    "sponsors_bar": "#262E67",
+    "link_strip": "#34B3D0",
+    "button": "#9E1F63"
+  },
+  "assets": {
+    "header": "https://files.constantcontact.com/da3b95bc001/3ef15c59-e6b2-4738-ae02-5cbf04d98783.jpg?rdr=true",
+    "header_alt": "Midreshet Torah V'Avodah",
+    "date_badge": "https://files.constantcontact.com/da3b95bc001/477104d0-03d6-4aa7-8ce5-bacd56ef8119.jpg?rdr=true",
+    "date_badge_width": 130,
+    "birthday": "https://files.constantcontact.com/da3b95bc001/b9f4077d-270b-49ee-a004-c055c71431fb.png?rdr=true",
+    "birthday_width": 136,
+    "about_logo": "https://files.constantcontact.com/da3b95bc001/885f0499-685d-4cb3-b43e-e735669b09e6.jpg?rdr=true"
+  },
+  "known_headshots": {
+    "Rabbi Aaron Bayer": "https://files.constantcontact.com/da3b95bc001/199bc2a6-f503-4081-a356-60a9e6095617.jpg?rdr=true"
+  },
+  "section_titles": {
+    "birthdays": null,
+    "mazal_tov": "MishpachatTVA Sharing Corner!",
+    "podcasts": "Podcasts & Machzor Minute!",
+    "sponsors": "Thank you to our Sponsors!",
+    "photos": "Photos"
+  },
+  "donate": {
+    "blurb": [
+      "Would you like to assist in funding MTVA's scholarships and programming?",
+      "Please click on the button below to make a safe online donation.",
+      "Thank You!"
+    ],
+    "label": "Please Click Here to Donate",
+    "url": "https://www.mtvaisrael.org/donate/"
+  },
+  "staff": [
+    [
+      "Rabbi Dr. Yehuda Seif",
+      "Rosh Yeshiva and Executive Director",
+      "Yeshivat and Midreshet TVA",
+      "yehudaseif@tvaisrael.org"
+    ],
+    [
+      "Rabbi Aaron Bayer",
+      "Director",
+      "Midreshet TVA",
+      "aaronbayer@tvaisrael.org"
+    ],
+    [
+      "Dr. Tamara Spitz",
+      "Rosh Beit Midrash & Mashgicha",
+      "Midreshet TVA",
+      "tamaraspitz@tvaisrael.org"
+    ],
+    [
+      "Rav Shaul Feldman",
+      "TVA Founder and Director of",
+      "Bnei Akiva of the US and Canada",
+      "sfeldman@bneiakiva.org"
+    ],
+    [
+      "Bini Dachs",
+      "Operations Director",
+      "Bnei Akiva of the US and Canada",
+      "bini@bneiakiva.org"
+    ],
+    [
+      "Michelle Kaplansky",
+      "Israel Programs Administrator",
+      "Bnei Akiva of the US and Canada",
+      "michellekaplansky@tvaisrael.org"
+    ]
+  ],
+  "contact": {
+    "name": "Midreshet Torah V'Avodah",
+    "israel": "Yossi ben Yoezer 32, Jerusalem, 93301-50",
+    "israel_phones": [
+      "646-248-7555",
+      "050-709-8304"
+    ],
+    "ny": "241 W 37th St #730 New York, NY 10018",
+    "ny_phone": "212-465-9536",
+    "email": "office@tvaisrael.org",
+    "website": "www.mtvaisrael.org",
+    "website_url": "https://www.mtvaisrael.org/"
+  },
+  "social": [],
+  "date_ordinal": true
+}

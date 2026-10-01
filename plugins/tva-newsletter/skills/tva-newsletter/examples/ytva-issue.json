@@ -1,0 +1,96 @@
+{
+ "program": "ytva",
+ "date": "2026-10-09",
+ "sections": [
+  {
+   "type": "video",
+   "heading": "Dvar Torah",
+   "byline": "Rav Yair (Eisenstock) HaLevi, Rosh Yeshiva",
+   "url": "https://youtu.be/1x4W5qc_iFA"
+  },
+  {
+   "type": "article",
+   "heading": "Weekly Update",
+   "byline": "Rav Yehoshua Segal, YTVA Director",
+   "image": "Rav Yehoshua Segal",
+   "image_side": "left",
+   "body": "What an uplifting and special week it has been at YTVA!\n\nRosh Hashanah was truly incredible. The Tefillot were nothing short of inspiring, and the meals, singing, and overall atmosphere were extraordinary. During the day, YTVA joined together with MTVA for Tefillot at a beautiful venue.\n\nEven with Monday being Tzom Gedaliah, both Monday and Tuesday were strong days of learning.\n\nWishing you and your families a Shabbat Shalom. G'mar Chatimah Tovah!"
+  },
+  {
+   "type": "article",
+   "heading": "Dvar Torah",
+   "byline": "Student Name; Hometown, ST; Shana Bet/Hesder",
+   "image": "3 Student Pieces/Student Name; Hometown, ST/photo.jpg",
+   "image_side": "left",
+   "body": "In preparation for Yom Kippur we talk about kapara all the time which is also the name of the day \"Yom Hakippurim\". But it seems like the focus is really on Tahara.\n\nThe pasuk says \"לפני ה׳ תטהרו\" so the big question is what is the difference between Kapara and Tahara?"
+  },
+  {
+   "type": "media",
+   "intro": "Enjoy these short divrei Torah about Yom Kippur from the rabbis of Yeshivat Torah v'Avodah.\n\nGmar Chatima Tova!",
+   "items": [
+    {
+     "url": "https://open.spotify.com/episode/37rdMiLSPx2pSiOrRXLQuB",
+     "caption": "Rav Gabi Katz: To Fast or Not to Fast"
+    },
+    {
+     "url": "https://open.spotify.com/episode/3rh02OTH5WnTiGrjU7IEly",
+     "caption": "Rav Avichai Berkovits: Entering the Kodesh HaKedoshim"
+    },
+    {
+     "url": "https://open.spotify.com/episode/2QfIvWnGFVSA3YwMOfKmye",
+     "caption": "Rav Tsvi Wohlgelernter: Yom Kippur and Shedding the Inner Cynic"
+    }
+   ]
+  },
+  {
+   "type": "announcement",
+   "heading": "In Israel for Sukkot?\nPlease Join Us for a Hachnasat Sefer Torah\nand for Hakafot Shniyot!",
+   "strip": {
+    "text": "Please Click {HERE} to RSVP for the Hachnasat Sefer Torah Event",
+    "url": "https://ytva-sefer-torah-rsvp.yehudaseif.workers.dev/"
+   },
+   "image": "5 Announcements/Hakafot/flyer.png"
+  },
+  {
+   "type": "birthdays",
+   "items": [
+    "Happy birthday to **Student Name** whose birthday is on the 20th!"
+   ]
+  },
+  {
+   "type": "sponsors",
+   "items": [
+    "Thank-you to the Family Name for sponsoring\nSunday Morning breakfast in honor of Student's Birthday!!",
+    "Thank-you to Sponsor Name for sponsoring\nTanach Shiur by Rav Yair!!"
+   ],
+   "contact": {
+    "text": "To sponsor any future programming, please contact",
+    "name": "Rav Gabi Katz",
+    "email": "Gabikatz@tvaisrael.org"
+   }
+  },
+  {
+   "type": "photos",
+   "albums": [
+    {
+     "caption": "Learning in the Beis!",
+     "photos": [
+      "6 Photos/Learning in the Beis!/1.jpg",
+      "6 Photos/Learning in the Beis!/2.jpg",
+      "6 Photos/Learning in the Beis!/3.jpg",
+      "6 Photos/Learning in the Beis!/4.jpg",
+      "6 Photos/Learning in the Beis!/5.jpg"
+     ]
+    },
+    {
+     "caption": "Chevron and Arugot Farm Tiyul!",
+     "photos": [
+      "6 Photos/Chevron and Arugot Farm Tiyul!/6.jpg",
+      "6 Photos/Chevron and Arugot Farm Tiyul!/7.jpg",
+      "6 Photos/Chevron and Arugot Farm Tiyul!/8.jpg"
+     ]
+    }
+   ]
+  }
+ ]
+}

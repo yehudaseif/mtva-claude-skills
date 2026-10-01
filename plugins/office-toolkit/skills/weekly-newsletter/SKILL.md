@@ -1,6 +1,6 @@
 ---
 name: weekly-newsletter
-description: Build the weekly parent newsletter as an email — produces paste-ready HTML for Constant Contact's Custom Code editor plus a plain-text version. Use when the user mentions Constant Contact, the weekly email, the parent newsletter, an email blast, or sending the week's update to parents.
+description: Build the weekly parent newsletter as an email — produces paste-ready HTML for Constant Contact's Custom Code editor plus a plain-text version. Use when the user mentions Constant Contact, the weekly email, the parent newsletter, an email blast, or sending the week's update to parents. For the MTVA/YTVA Shabbat newsletters use tva-newsletter instead.
 ---
 
 # Weekly Newsletter

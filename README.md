@@ -17,6 +17,7 @@ Then install only what your job needs:
 claude plugin install student-reports@mtva-skills      # attendance → PDF reports
 claude plugin install footage-review@mtva-skills       # video transcription + indexing
 claude plugin install classroom-materials@mtva-skills  # worksheets and answer keys
+claude plugin install tva-newsletter@mtva-skills       # weekly MTVA + YTVA Constant Contact newsletters
 ```
 
 Restart Claude Code. There is nothing to configure — describe what you want in
@@ -81,6 +82,17 @@ The differentiated version is the point: same content and same answer key,
 different access. It's the version nobody has time to make by hand.
 
 **Needs:** nothing. The Word skill ships with Claude Code.
+
+### `tva-newsletter`
+The Friday MTVA and YTVA emails. Everything that never changes (header art,
+colours, staff, contact, donate button, footer) is fixed in
+`programs/mtva.json` / `programs/ytva.json`; staff drop the week's pieces into
+`~/Documents/TVA Newsletter/<date> <parsha>/{MTVA,YTVA}/` and Claude builds the
+email, hosts the photos, creates the Constant Contact draft and sends a test.
+Scheduling the real send needs a person's go-ahead (`--confirm`).
+
+**Needs:** a one-time setup — a free Constant Contact API key and a photo host.
+See `plugins/tva-newsletter/skills/tva-newsletter/SETUP.md`. Plus `pip3 install pillow`.
 
 ## Not in here, on purpose
 

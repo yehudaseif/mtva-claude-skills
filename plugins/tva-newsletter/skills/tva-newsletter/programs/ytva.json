@@ -1,0 +1,108 @@
+{
+  "key": "ytva",
+  "short": "YTVA",
+  "name": "Yeshivat Torah V'Avodah",
+  "subject": "Shabbat Shalom from YTVA - {parsha}",
+  "campaign_name": "YTVA Newsletter - {parsha} {hebrew_year} ({date})",
+  "colors": {
+    "page": "#262E67",
+    "frame": "#40BFB4",
+    "date_band": "#294B93",
+    "section_bar": "#FFB014",
+    "feature_bar": "#FFB014",
+    "text": "#262E67",
+    "footer_heading": "#FBB040",
+    "birthday_bg": "#40BFB4",
+    "sponsors_bar": "#262E67",
+    "link_strip": "#34B3D0",
+    "button": "#40BFB4"
+  },
+  "assets": {
+    "header": "https://files.constantcontact.com/da3b95bc001/0f702d36-b5b7-44dd-b9e9-ed936b7a880e.jpg?rdr=true",
+    "header_alt": "Yeshivat Torah V'Avodah",
+    "date_badge": "https://files.constantcontact.com/da3b95bc001/3e30b908-99e1-4bc2-944d-5f1af2c79f82.jpg?rdr=true",
+    "date_badge_width": 113,
+    "birthday": "https://files.constantcontact.com/da3b95bc001/b9f4077d-270b-49ee-a004-c055c71431fb.png?rdr=true",
+    "birthday_width": 151,
+    "about_logo": "https://files.constantcontact.com/da3b95bc001/885f0499-685d-4cb3-b43e-e735669b09e6.jpg?rdr=true"
+  },
+  "known_headshots": {
+    "Rav Yehoshua Segal": "https://files.constantcontact.com/da3b95bc001/def0a854-d087-49a8-b1ea-a172d9061bb6.jpg?rdr=true"
+  },
+  "section_titles": {
+    "birthdays": "Happy Birthday!",
+    "mazal_tov": "Mazal Tov!",
+    "podcasts": "YTVA Podcasts!",
+    "sponsors": "Thank you to our Sponsors!",
+    "photos": "Photos"
+  },
+  "donate": {
+    "blurb": [],
+    "label": "Please Click Here to Donate",
+    "url": "https://www.ytvaisrael.org/donate/"
+  },
+  "staff": [
+    [
+      "Rabbi Dr. Yehuda Seif",
+      "Rosh Yeshiva and Executive Director",
+      "Yeshivat and Midreshet Torah V'Avodah",
+      "yehudaseif@tvaisrael.org"
+    ],
+    [
+      "Rabbi Yair HaLevi (Eisenstock)",
+      "Rosh Yeshiva",
+      "Yeshivat Torah V'Avodah",
+      "ravyair@tvaisrael.org"
+    ],
+    [
+      "Rav Yehoshua Segal",
+      "Director",
+      "Yeshivat Torah V'Avodah",
+      "yehoshuasegal@tvaisrael.org"
+    ],
+    [
+      "Rav Shaul Feldman",
+      "TVA Founder and Director of",
+      "Bnei Akiva of the US and Canada",
+      "sfeldman@bneiakiva.org"
+    ],
+    [
+      "Mrs. Bini Dachs",
+      "Operations Director",
+      "Bnei Akiva of the US and Canada",
+      "bini@bneiakiva.org"
+    ],
+    [
+      "Mrs. Michelle Kaplansky",
+      "Israel Programs Administrator",
+      "Bnei Akiva of the US and Canada",
+      "michellekaplansky@tvaisrael.org"
+    ]
+  ],
+  "contact": {
+    "name": "Yeshivat Torah V'Avodah",
+    "israel": "Gad 8, Jerusalem, 93622-07",
+    "israel_phones": [
+      "646-248-7555",
+      "050-709-8304"
+    ],
+    "ny": "241 West 37th Street, Suite 730 New York, NY 10018",
+    "ny_phone": "212-465-9536",
+    "email": "office@tvaisrael.org",
+    "website": "www.ytvaisrael.org",
+    "website_url": "https://www.ytvaisrael.org/"
+  },
+  "social": [
+    [
+      "Facebook",
+      "https://www.facebook.com/ytvaisrael",
+      "https://imgssl.constantcontact.com/letters/images/CPE/SocialIcons/circles/circleBlack_Facebook_v4.png"
+    ],
+    [
+      "Instagram",
+      "https://www.instagram.com/ytvaisrael/",
+      "https://imgssl.constantcontact.com/letters/images/CPE/SocialIcons/circles/circleBlack_Instagram_v4.png"
+    ]
+  ],
+  "date_ordinal": false
+}
