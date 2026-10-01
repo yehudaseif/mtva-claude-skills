@@ -69,7 +69,7 @@ Happy Birthday → Thank you to our Sponsors → Photos.
        {"url": "https://open.spotify.com/episode/...", "caption": "Rav X: Title"}]},
     {"type": "announcement", "heading": "Line one\nLine two", "image": "5 Announcements/flyer.png",
      "url": "optional link on the flyer", "body": "optional text",
-     "strip": {"text": "Please Click {HERE} to RSVP", "url": "https://..."}},
+     "button": {"label": "RSVP for the Hachnasat Sefer Torah", "url": "https://..."}},
     {"type": "birthdays", "items": ["Happy birthday to **Name** whose birthday is on Shabbat!"]},
     {"type": "mazal_tov", "items": ["Mazal Tov to **Name** (5783) and Sam on their engagement!",
        {"text": "Mazal Tov to **Name** on her Aliyah!", "image": "photo.jpg"}]},
@@ -82,9 +82,22 @@ Happy Birthday → Thank you to our Sponsors → Photos.
 }
 ```
 (Comments above are for you; the real file is plain JSON.) Headings left `null` use the
-program's standard title (`section_titles` in the program file). Landscape photos run
-full width; portraits pair up side by side automatically. Add `"skip": true` to drop a
-section without deleting it.
+program's standard title (`section_titles` in the program file). Add `"skip": true` to
+drop a section without deleting it.
+
+How the layout uses these fields (it is automatic; this is so you fill them well):
+- `byline` splits at the first `;` or `,`: the name in bold, the rest (role, hometown,
+  shana) underneath in grey. An `image` there is shown as a round headshot beside it —
+  use a photo of that person, never a group shot. Long pieces get "N min read" added.
+- With a `title`, the `heading` becomes a small coloured label above it (student pieces:
+  heading "Student Dvar Torah", title = the student's own title). Without one, the
+  heading is the section title.
+- Podcast captions split at the first `:` into speaker and episode title.
+- Announcement buttons: use the wording the folder gives for the link ("RSVP", "Register
+  here"). A legacy `strip` with `{HERE}` still works but makes a clumsier button.
+- Landscape photos run full width; portraits pair up side by side; on phones everything
+  stacks to full width.
+- "In this issue" under the header is built from the section headings.
 
 **The words are the authors'.** Copy divrei Torah, updates and reflections verbatim,
 paragraph for paragraph — no rewording, trimming, or "polish". If you notice a typo or

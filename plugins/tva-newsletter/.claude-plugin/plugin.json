@@ -1,6 +1,6 @@
 {
   "name": "tva-newsletter",
   "description": "The weekly MTVA and YTVA Shabbat newsletters: turns a folder of weekly pieces (dvar Torah, update, photos, mazal tovs, birthdays, podcasts, flyers) into each program's house-style email and creates the Constant Contact draft.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": { "name": "MTVA" }
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mtva-skills",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "House Claude Code skills for MTVA admin staff — attendance analysis and student-facing PDF reports, video footage transcription and indexing, and classroom material generation.",
   "owner": {
     "name": "MTVA"
@@ -50,7 +50,7 @@
     {
       "name": "tva-newsletter",
       "description": "The weekly MTVA and YTVA Shabbat newsletters in Constant Contact. Staff drop the week's pieces (dvar Torah, update, photos, mazal tovs, birthdays, podcasts, flyers) in a folder; Claude fills each program's fixed house template, hosts the photos, and creates the draft and test send. Sending to families stays a human decision.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "MTVA"
       },

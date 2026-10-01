@@ -45,11 +45,11 @@
   {
    "type": "announcement",
    "heading": "In Israel for Sukkot?\nPlease Join Us for a Hachnasat Sefer Torah\nand for Hakafot Shniyot!",
-   "strip": {
-    "text": "Please Click {HERE} to RSVP for the Hachnasat Sefer Torah Event",
+   "image": "5 Announcements/Hakafot/flyer.png",
+   "button": {
+    "label": "RSVP for the Hachnasat Sefer Torah",
     "url": "https://ytva-sefer-torah-rsvp.yehudaseif.workers.dev/"
-   },
-   "image": "5 Announcements/Hakafot/flyer.png"
+   }
   },
   {
    "type": "birthdays",

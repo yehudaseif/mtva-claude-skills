@@ -5,17 +5,9 @@
   "subject": "Shabbat Shalom from MTVA - {parsha}",
   "campaign_name": "MTVA Newsletter - {parsha} {hebrew_year} ({date})",
   "colors": {
-    "page": "#262E67",
-    "frame": "#9E1F63",
-    "date_band": "#9E1F63",
-    "section_bar": "#F7BA3E",
-    "feature_bar": "#FFC043",
-    "text": "#262E67",
-    "footer_heading": "#FBB040",
-    "birthday_bg": "#262E67",
-    "sponsors_bar": "#262E67",
-    "link_strip": "#34B3D0",
-    "button": "#9E1F63"
+    "accent": "#9E1F63",
+    "accent_text": "#9E1F63",
+    "tint": "#FBF1F6"
   },
   "assets": {
     "header": "https://files.constantcontact.com/da3b95bc001/3ef15c59-e6b2-4738-ae02-5cbf04d98783.jpg?rdr=true",

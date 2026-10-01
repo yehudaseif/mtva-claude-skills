@@ -28,7 +28,7 @@ except ImportError:
 CONFIG = Path.home() / ".config" / "tva-newsletter" / "config.json"
 PROGRAMS = Path(__file__).resolve().parent.parent / "programs"
 # max pixel width per role (2x the display width, for sharp phones)
-WIDTH = {"photo": 1120, "flyer": 1120, "headshot": 400, "mazal": 400, "thumb": 520, "video": 1040}
+WIDTH = {"photo": 1080, "flyer": 1000, "avatar": 240, "mazal": 440, "thumb": 200, "video": 1080}
 
 
 def is_local(ref, known):
@@ -40,8 +40,8 @@ def walk(issue):
     """Yield (container, key, role) for every image slot in the issue."""
     for s in issue["sections"]:
         t = s["type"]
-        if t in ("article",) and s.get("image"):
-            yield s, "image", "headshot"
+        if t in ("article", "video", "text") and s.get("image"):
+            yield s, "image", "avatar"
         if t == "announcement" and s.get("image"):
             yield s, "image", "flyer"
         if t == "video" and s.get("thumbnail"):
@@ -81,6 +81,11 @@ def prepare(path, role):
             bg.paste(im, mask=im.split()[-1])
             im = bg
         im = im.convert("RGB")
+        if role == "avatar":  # square, biased toward the top where faces are
+            side = min(im.size)
+            top = int((im.height - side) * 0.2)
+            left = (im.width - side) // 2
+            im = im.crop((left, top, left + side, top + side))
         if im.width > WIDTH[role]:
             im = im.resize((WIDTH[role], round(im.height * WIDTH[role] / im.width)), Image.LANCZOS)
         if role == "video":
@@ -162,10 +167,16 @@ def main():
     todo, missing = [], []
     for cont, key, role in walk(issue):
         ref = cont[key]
-        if not is_local(ref, known):
+        if role == "avatar" and isinstance(ref, str) and (ref in known or ref.startswith("http")):
+            # headshots on file are not square: fetch and crop them like any other
+            raw = urllib.request.urlopen(known.get(ref, ref), timeout=30).read()
+            src = outdir / f"_src-{re.sub(r'[^a-z0-9]+', '-', ref.lower())[:30]}.jpg"
+            src.write_bytes(raw)
+        elif not is_local(ref, known):
             continue
-        src = Path(ref).expanduser()
-        src = src if src.is_absolute() else base / src
+        else:
+            src = Path(ref).expanduser()
+            src = src if src.is_absolute() else base / src
         if not src.exists():
             missing.append(str(src))
             continue

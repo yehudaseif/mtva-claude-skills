@@ -13,7 +13,6 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 PROGRAMS = HERE.parent / "programs"
-FONT = "Helvetica,Arial,sans-serif"
 MAX_BYTES = 400 * 1024          # Constant Contact hard limit
 GMAIL_CLIP = 102 * 1024         # Gmail clips bodies past ~102 KB ("[Message clipped]")
 
@@ -55,15 +54,6 @@ def inline(text):
     t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
     t = re.sub(r"(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?![*\w])", r"<em>\1</em>", t)
     return t.replace("\n", "<br>")
-
-
-def paragraphs(body, color, size=14, align="left"):
-    if isinstance(body, list):
-        body = "\n\n".join(body)
-    paras = [p for p in re.split(r"\n\s*\n", body.strip()) if p.strip()]
-    return "".join(
-        f'<p dir="auto" style="margin:0 0 14px 0;font-family:{FONT};font-size:{size}px;line-height:1.35;color:{color};text-align:{align};">{inline(p)}</p>'
-        for p in paras)
 
 
 def img_src(ref):
@@ -110,70 +100,144 @@ class Ctx:
         return self.p.get("known_headshots", {}).get(name_or_ref, name_or_ref)
 
 
-# ---------------------------------------------------------------- blocks
-def row(inner, bg="#FFFFFF", pad="10px 20px", align="left"):
+# ---------------------------------------------------------------- design tokens
+SANS = "Helvetica,Arial,sans-serif"
+SERIF = "Georgia,'Times New Roman',serif"
+INK = "#24273A"          # body text
+NAVY = "#262E67"         # headings, donate band
+MUTED = "#6B6F82"        # secondary text
+RULE = "#E6E4EC"         # hairlines
+PAGE = "#ECEEF3"         # outside the card
+FOOT = "#F6F5F8"         # footer panel
+GOLD = "#F7BA3E"
+CARD_W, PAD = 600, 32
+INNER = CARD_W - 2 * PAD  # 536
+
+
+def avatar_square(x, ref):
+    """Preview only: square-crop a headshot (local or remote) so the circle is not stretched."""
+    try:
+        from PIL import Image, ImageOps
+        import hashlib, io
+        src = img_src(ref)
+        raw = urllib.request.urlopen(src, timeout=20).read() if src.startswith("http") else resolve_local(src, x.base).read_bytes()
+        im = ImageOps.exif_transpose(Image.open(io.BytesIO(raw))).convert("RGB")
+        s = min(im.size)
+        top = int((im.height - s) * 0.2)  # faces sit high in portraits
+        im = im.crop(((im.width - s) // 2, top, (im.width - s) // 2 + s, top + s)).resize((240, 240), Image.LANCZOS)
+        d = x.base / "out" / "_preview"
+        d.mkdir(parents=True, exist_ok=True)
+        f = d / f"avatar-{hashlib.sha1(raw).hexdigest()[:10]}.jpg"
+        im.save(f, "JPEG", quality=85)
+        return f.as_uri()
+    except Exception as e:
+        print(f"  ! could not crop headshot for preview: {e}", file=sys.stderr)
+        return None
+
+
+def row(inner, bg="#FFFFFF", pad=f"28px {PAD}px", align="left", cls="px"):
     return (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="{bg}" style="background-color:{bg};">'
-            f'<tr><td align="{align}" style="padding:{pad};">{inner}</td></tr></table>')
+            f'<tr><td class="{cls}" align="{align}" style="padding:{pad};">{inner}</td></tr></table>')
 
 
-def divider(x):
-    return row(f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td height="2" style="height:2px;line-height:2px;font-size:0;background-color:{x.c["frame"]};">&nbsp;</td></tr></table>',
-               pad="10px 20px")
+def rule():
+    return row(f'<div style="height:1px;line-height:1px;font-size:0;background-color:{RULE};">&nbsp;</div>', pad=f"0 {PAD}px")
 
 
-def section_bar(x, heading, byline=None):
-    inner = f'<div style="font-family:{FONT};font-size:24px;font-weight:bold;color:#FFFFFF;line-height:1.2;">{inline(heading)}</div>'
-    if byline:
-        inner += f'<div style="font-family:{FONT};font-size:16px;font-weight:bold;color:#FFFFFF;line-height:1.3;">{inline(byline)}</div>'
-    return row(inner, bg=x.c["section_bar"], pad="10px 20px")
+def eyebrow(x, text):
+    return (f'<div style="font-family:{SANS};font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;'
+            f'color:{x.c["accent_text"]};margin:0 0 8px 0;">{inline(text)}</div>')
 
 
-def feature_bar(x, heading, bg=None):
-    inner = f'<div style="font-family:{FONT};font-size:22px;font-weight:bold;color:#FFFFFF;line-height:1.3;text-align:center;">{inline(heading)}</div>'
-    return row(inner, bg=bg or x.c["feature_bar"], pad="10px 20px", align="center")
+def h2(text, size=26):
+    return (f'<h2 dir="auto" style="margin:0 0 14px 0;font-family:{SERIF};font-size:{size}px;line-height:1.25;font-weight:bold;color:{NAVY};">'
+            f'{inline(text)}</h2>')
 
 
-def image_tag(x, ref, width, alt, link=None, extra=""):
-    cls = "full" if width >= 500 else "scale"
+def body_text(body, serif=True, size=None, color=INK, align="left"):
+    if isinstance(body, list):
+        body = "\n\n".join(body)
+    fam, size = (SERIF, size or 17) if serif else (SANS, size or 15)
+    paras = [p for p in re.split(r"\n\s*\n", body.strip()) if p.strip()]
+    return "".join(f'<p dir="auto" style="margin:0 0 16px 0;font-family:{fam};font-size:{size}px;line-height:1.65;color:{color};text-align:{align};">{inline(p)}</p>'
+                   for p in paras)
+
+
+def image_tag(x, ref, width, alt, link=None, radius=8, extra="", cls=None):
+    cls = cls or ("full" if width >= 400 else "scale")
     tag = (f'<img src="{html.escape(x.url(ref))}" width="{width}" alt="{html.escape(alt)}" border="0" class="{cls}" '
-           f'style="display:block;width:{width}px;max-width:100%;height:auto;border:0;{extra}">')
+           f'style="display:block;width:{width}px;max-width:100%;height:auto;border:0;border-radius:{radius}px;{extra}">')
     if link:
         tag = f'<a href="{html.escape(link)}" target="_blank" style="text-decoration:none;">{tag}</a>'
     return tag
 
 
-def b_header(x, issue, hdr):
-    c, a = x.c, x.p["assets"]
-    top = row(image_tag(x, a["header"], 600, a.get("header_alt", x.p["name"])), bg=c["frame"], pad="0")
-    lines = [issue["title"], hdr["date_line"]]
+def button(x, label, url, bg=None, fg="#FFFFFF", center=False):
+    bg = bg or x.c["accent_text"]
+    align, m = ('align="center" ', "auto") if center else ("", "0")
+    return (f'<table role="presentation" {align}border="0" cellpadding="0" cellspacing="0" style="margin:4px {m} 0 {m};"><tr>'
+            f'<td bgcolor="{bg}" style="background-color:{bg};border-radius:999px;padding:12px 26px;">'
+            f'<a href="{html.escape(url)}" target="_blank" style="font-family:{SANS};font-size:15px;font-weight:bold;color:{fg};text-decoration:none;">{html.escape(label)}</a>'
+            f'</td></tr></table>')
+
+
+def byline_row(x, byline, image, words=0):
+    if not byline and not image:
+        return ""
+    parts = [p.strip() for p in re.split(r"[;,]", byline or "", maxsplit=1)]
+    name, role = parts[0], (parts[1] if len(parts) > 1 else "")
+    meta = role
+    if words > 250:
+        meta = f"{meta} · {max(1, round(words / 220))} min read" if meta else f"{max(1, round(words / 220))} min read"
+    pic = ""
+    shot = x.headshot(image)
+    if shot:
+        src = avatar_square(x, shot) if x.preview else None
+        src = src or x.url(shot)
+        pic = (f'<td width="64" valign="middle" style="padding:0 14px 0 0;"><img src="{html.escape(src)}" width="64" height="64" alt="{html.escape(name)}" '
+               f'style="display:block;width:64px;height:64px;border-radius:50%;border:0;"></td>')
+    text = (f'<div dir="auto" style="font-family:{SANS};font-size:15px;font-weight:bold;color:{INK};line-height:1.35;">{inline(name)}</div>'
+            + (f'<div dir="auto" style="font-family:{SANS};font-size:13px;color:{MUTED};line-height:1.4;">{inline(meta)}</div>' if meta else ""))
+    return (f'<table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 0 20px 0;"><tr>{pic}'
+            f'<td valign="middle">{text}</td></tr></table>')
+
+
+def word_count(body):
+    return len(re.findall(r"\w+", body if isinstance(body, str) else " ".join(body)))
+
+
+# ---------------------------------------------------------------- blocks
+def b_header(x, issue, hdr, toc):
+    a = x.p["assets"]
+    top = row(image_tag(x, a["header"], CARD_W, a.get("header_alt", x.p["name"]), radius=0), pad="0", cls="")
+    meta = " · ".join(p for p in (hdr["date_text"], hdr.get("hebrew_date")) if p)
+    left = (eyebrow(x, f"Shabbat Shalom from {x.p['short']}")
+            + f'<h1 dir="auto" class="h1" style="margin:0 0 10px 0;font-family:{SERIF};font-size:32px;line-height:1.2;font-weight:bold;color:{NAVY};">{"<br>".join(html.escape(p) for p in issue["title"].split(" - "))}</h1>'
+            + f'<div style="font-family:{SANS};font-size:15px;color:{MUTED};margin:0 0 14px 0;">{html.escape(meta)}</div>')
     if hdr.get("candles"):
-        lines.append(f"Hadlakat Neirot in Yerushalayim: {hdr['candles']}")
-    text = "".join(
-        f'<div style="font-family:{FONT};font-size:{23 if i == 0 else 19}px;font-weight:bold;color:#FFFFFF;line-height:1.15;">{html.escape(l)}</div>'
-        for i, l in enumerate(lines))
-    badge = image_tag(x, a["date_badge"], a.get("date_badge_width", 130), "Together we will win")
-    band = (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
-            f'<td class="stack" align="center" valign="middle" style="padding:0 10px 0 0;text-align:center;">{text}</td>'
-            f'<td class="stack" width="{a.get("date_badge_width", 130)}" align="right" valign="middle" style="padding:0;">{badge}</td>'
-            f'</tr></table>')
-    gap = '<div style="height:16px;line-height:16px;font-size:0;">&nbsp;</div>'
-    return top + gap + row(band, bg=c["date_band"], pad="12px 20px") + gap
+        left += (f'<table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td bgcolor="{x.c["tint"]}" '
+                 f'style="background-color:{x.c["tint"]};border-radius:999px;padding:7px 14px;font-family:{SANS};font-size:13px;color:{INK};">'
+                 f'Candle lighting in Jerusalem&nbsp;&nbsp;<strong>{html.escape(hdr["candles"])}</strong></td></tr></table>')
+    badge = ""
+    if a.get("date_badge"):
+        badge = (f'<td class="hide-sm" width="104" valign="top" align="right" style="padding:4px 0 0 16px;">'
+                 f'{image_tag(x, a["date_badge"], 104, "Together we will win", radius=8)}</td>')
+    block = (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
+             f'<td valign="top">{left}</td>{badge}</tr></table>')
+    out = top + row(block, pad=f"20px {PAD}px 26px {PAD}px")
+    if len(toc) > 1:
+        dot = '<span style="color:#B9B7C6;">&nbsp;&middot;</span>'
+        items = " ".join(f'<span style="white-space:nowrap;">{html.escape(t)}{dot if i < len(toc) - 1 else ""}</span>' for i, t in enumerate(toc))
+        out += row(f'<div style="border-top:1px solid {RULE};border-bottom:1px solid {RULE};padding:12px 0;font-family:{SANS};font-size:13px;line-height:1.7;color:{MUTED};">'
+                   f'<strong style="color:{INK};">In this issue:</strong>&nbsp; {items}</div>', pad=f"0 {PAD}px")
+    return out
 
 
 def b_article(x, s):
-    out = section_bar(x, s["heading"], s.get("byline"))
-    shot = x.headshot(s.get("image"))
-    inner = ""
-    if s.get("title"):
-        inner += f'<p dir="auto" style="margin:0 0 12px 0;font-family:{FONT};font-size:16px;font-weight:bold;color:{x.c["text"]};text-align:center;">{inline(s["title"])}</p>'
-    if shot:
-        side = s.get("image_side", "right")
-        w = int(s.get("image_width", 160))
-        pad = "0 0 10px 15px" if side == "right" else "0 15px 10px 0"
-        inner = (f'<table role="presentation" align="{side}" border="0" cellpadding="0" cellspacing="0" class="float-img" style="float:{side};">'
-                 f'<tr><td style="padding:{pad};">{image_tag(x, shot, w, s.get("byline") or s["heading"])}</td></tr></table>') + inner
-    inner += paragraphs(s["body"], x.c["text"])
-    return out + row(inner, pad="12px 20px 2px 20px") + divider(x)
+    inner = eyebrow(x, s["heading"]) + h2(s["title"]) if s.get("title") else h2(s["heading"])
+    inner += byline_row(x, s.get("byline"), s.get("image"), word_count(s["body"]))
+    inner += body_text(s["body"])
+    return row(inner)
 
 
 def youtube_id(url):
@@ -182,20 +246,18 @@ def youtube_id(url):
 
 
 def b_video(x, s):
-    out = section_bar(x, s["heading"], s.get("byline"))
+    inner = eyebrow(x, s["heading"]) + h2(s["title"]) if s.get("title") else h2(s["heading"])
+    inner += byline_row(x, s.get("byline"), s.get("image"))
     thumb = s.get("thumbnail")
     if not thumb:
         vid = youtube_id(s["url"])
         thumb = f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg" if vid else None
-    inner = ""
     if thumb:
-        inner += f'<div style="text-align:center;">{image_tag(x, thumb, 520, "Watch: " + (s.get("byline") or s["heading"]), link=s["url"], extra="margin:0 auto;")}</div>'
-    label = s.get("link_text", "▶ Click to watch")
-    inner += (f'<p style="margin:10px 0 4px 0;font-family:{FONT};font-size:14px;font-weight:bold;text-align:center;">'
-              f'<a href="{html.escape(s["url"])}" target="_blank" style="color:{x.c["text"]};">{html.escape(label)}</a></p>')
+        inner += f'<div style="margin:0 0 16px 0;">{image_tag(x, thumb, INNER, "Watch: " + (s.get("byline") or s["heading"]), link=s["url"], radius=10)}</div>'
+    inner += button(x, s.get("link_text", "▶  Watch the video"), s["url"])
     if s.get("body"):
-        inner += paragraphs(s["body"], x.c["text"])
-    return out + row(inner, pad="12px 20px 6px 20px") + divider(x)
+        inner += '<div style="height:16px;"></div>' + body_text(s["body"])
+    return row(inner)
 
 
 def media_thumb(item):
@@ -203,7 +265,7 @@ def media_thumb(item):
         return item["image"]
     vid = youtube_id(item["url"])
     if vid:
-        return f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg"
+        return f"https://i.ytimg.com/vi/{vid}/mqdefault.jpg"
     if "spotify.com" in item["url"]:
         try:
             q = "https://open.spotify.com/oembed?url=" + urllib.parse.quote(item["url"].split("?")[0], safe="")
@@ -214,172 +276,195 @@ def media_thumb(item):
 
 
 def b_media(x, s):
-    out = feature_bar(x, s.get("heading") or x.p["section_titles"]["podcasts"])
-    inner = paragraphs(s["intro"], x.c["text"], align="center") if s.get("intro") else ""
-    items = s["items"]
-    cells = []
-    for it in items:
-        th = media_thumb(it)
-        pic = image_tag(x, th, 240, it["caption"], link=it["url"], extra="margin:0 auto;") if th else ""
-        cap = (f'<p dir="auto" style="margin:8px 0 0 0;font-family:{FONT};font-size:13px;font-weight:bold;color:{x.c["text"]};text-align:center;">'
-               f'<a href="{html.escape(it["url"])}" target="_blank" style="color:{x.c["text"]};text-decoration:none;">{inline(it["caption"])}</a></p>')
-        cells.append(f'<div style="text-align:center;">{pic}</div>{cap}')
-    rows = ""
-    for i in range(0, len(cells), 2):
-        pair = cells[i:i + 2]
-        if len(pair) == 1:
-            rows += f'<tr><td colspan="2" align="center" valign="top" style="padding:10px 0;"><table role="presentation" width="270" align="center" border="0" cellpadding="0" cellspacing="0"><tr><td>{pair[0]}</td></tr></table></td></tr>'
-        else:
-            rows += "<tr>" + "".join(f'<td class="stack" width="50%" align="center" valign="top" style="padding:10px 5px;">{c}</td>' for c in pair) + "</tr>"
-    inner += f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0">{rows}</table>'
-    return out + row(inner, pad="12px 20px") + divider(x)
+    inner = h2(s.get("heading") or x.p["section_titles"]["podcasts"])
+    if s.get("intro"):
+        inner += body_text(s["intro"], serif=False, color=MUTED)
+    # one table per item keeps Outlook from merging rows
+    inner += "".join(_media_item(x, it, i) for i, it in enumerate(s["items"]))
+    return row(inner)
+
+
+def _media_item(x, it, i):
+    th = media_thumb(it)
+    speaker, _, title = it["caption"].partition(":")
+    if not title:
+        speaker, title = "", it["caption"]
+    u = it["url"]
+    kind = "Watch on YouTube" if "youtu" in u else "Listen on Spotify" if "spotify" in u else "Open"
+    pic = f'<td width="96" valign="top" style="padding:0 16px 0 0;">{image_tag(x, th, 96, it["caption"], link=u, radius=8)}</td>' if th else ""
+    txt = ((f'<div dir="auto" style="font-family:{SANS};font-size:13px;font-weight:bold;color:{MUTED};margin:0 0 3px 0;text-align:left;">{inline(speaker.strip())}</div>' if speaker else "")
+           + f'<div dir="auto" style="font-family:{SERIF};font-size:17px;line-height:1.35;font-weight:bold;margin:0 0 6px 0;text-align:left;">'
+             f'<a href="{html.escape(u)}" target="_blank" style="color:{NAVY};text-decoration:none;">{inline(title.strip())}</a></div>'
+           + f'<a href="{html.escape(u)}" target="_blank" style="font-family:{SANS};font-size:13px;font-weight:bold;color:{x.c["accent_text"]};text-decoration:none;">{kind} &rarr;</a>')
+    top = f"border-top:1px solid {RULE};" if i else ""
+    return (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="{top}"><tr>'
+            f'{pic}<td valign="middle" style="padding:14px 0;">{txt}</td></tr></table>')
 
 
 def b_announcement(x, s):
-    out = feature_bar(x, s["heading"])
-    if s.get("strip"):
-        st = s["strip"]
-        t = html.escape(st["text"], quote=False)
-        link = f'<a href="{html.escape(st["url"])}" target="_blank" style="color:#FFFFFF;font-weight:bold;text-decoration:underline;">'
-        t = re.sub(r"\{(.+?)\}", lambda m: f"{link}{m.group(1)}</a>", t) if "{" in t else f"{link}{t}</a>"
-        out += row(f'<div style="font-family:{FONT};font-size:16px;font-weight:bold;color:{x.c["text"]};text-align:center;">{t}</div>',
-                   bg=x.c["link_strip"], pad="8px 20px", align="center")
-    inner = ""
+    inner = h2(s["heading"], size=22)
     if s.get("body"):
-        inner += paragraphs(s["body"], x.c["text"], align=s.get("align", "center"))
+        inner += body_text(s["body"], serif=False)
+    btn = s.get("button")
+    if not btn and s.get("strip"):
+        btn = {"label": re.sub(r"[{}]", "", s["strip"]["text"]), "url": s["strip"]["url"]}
     if s.get("image"):
-        inner += f'<div style="text-align:center;">{image_tag(x, s["image"], 560, s.get("alt") or s["heading"].replace(chr(10), " "), link=s.get("url"), extra="margin:0 auto;")}</div>'
-    return out + row(inner, pad="12px 20px") + divider(x)
+        inner += f'<div style="margin:4px 0 {18 if btn else 0}px 0;">{image_tag(x, s["image"], INNER - 48, s.get("alt") or s["heading"].replace(chr(10), " "), link=s.get("url") or (btn or {}).get("url"))}</div>'
+    if btn:
+        inner += button(x, btn["label"], btn["url"])
+    card = (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
+            f'<td class="card" bgcolor="{x.c["tint"]}" style="background-color:{x.c["tint"]};border-radius:12px;padding:24px;">{inner}</td></tr></table>')
+    return row(card, pad=f"24px {PAD}px")
 
 
 def b_birthdays(x, s):
-    a, title = x.p["assets"], s.get("heading", x.p["section_titles"].get("birthdays"))
-    text = ""
-    if title:
-        text += f'<div style="font-family:{FONT};font-size:24px;font-weight:bold;color:#FFFFFF;text-align:center;margin-bottom:6px;">{inline(title)}</div>'
+    a = x.p["assets"]
+    title = s.get("heading") or x.p["section_titles"].get("birthdays") or "Happy Birthday!"
+    text = h2(title, size=22)
     for it in s["items"]:
-        text += f'<p dir="auto" style="margin:0 0 6px 0;font-family:{FONT};font-size:15px;color:#FFFFFF;text-align:center;line-height:1.3;">{inline(it)}</p>'
-    text += f'<p dir="rtl" style="margin:6px 0 0 0;font-family:{FONT};font-size:16px;color:#FFFFFF;text-align:center;">{inline(s.get("closing", "!עד מאה ועשרים"))}</p>'
-    pic = image_tag(x, a["birthday"], a.get("birthday_width", 136), "Happy Birthday")
-    inner = (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
-             f'<td class="stack" width="{a.get("birthday_width", 136)}" valign="middle" style="padding:0 15px 0 0;">{pic}</td>'
-             f'<td class="stack" valign="middle">{text}</td></tr></table>')
-    return row(inner, bg=x.c["birthday_bg"], pad="15px 20px") + divider(x)
+        text += f'<p dir="auto" style="margin:0 0 6px 0;font-family:{SANS};font-size:16px;line-height:1.5;color:{INK};">{inline(it)}</p>'
+    text += f'<p dir="rtl" style="margin:8px 0 0 0;font-family:{SANS};font-size:16px;color:{x.c["accent_text"]};text-align:left;">{inline(s.get("closing", "!עד מאה ועשרים"))}</p>'
+    pic = f'<td class="hide-sm" width="96" valign="middle" style="padding:0 20px 0 0;">{image_tag(x, a["birthday"], 96, "Happy Birthday", radius=10)}</td>'
+    card = (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
+            f'<td class="card" bgcolor="{x.c["tint"]}" style="background-color:{x.c["tint"]};border-radius:12px;padding:24px;">'
+            f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>{pic}<td valign="middle">{text}</td></tr></table>'
+            f'</td></tr></table>')
+    return row(card, pad=f"24px {PAD}px")
 
 
 def b_mazal_tov(x, s):
-    out = feature_bar(x, s.get("heading") or x.p["section_titles"]["mazal_tov"])
-    inner = ""
+    inner = h2(s.get("heading") or x.p["section_titles"]["mazal_tov"])
     for it in s["items"]:
         it = {"text": it} if isinstance(it, str) else it
-        inner += f'<p dir="auto" style="margin:0 0 12px 0;font-family:{FONT};font-size:15px;color:{x.c["text"]};line-height:1.35;">{inline(it["text"])}</p>'
+        inner += (f'<div dir="auto" style="border-left:3px solid {x.c["accent"]};padding:2px 0 2px 14px;margin:0 0 14px 0;'
+                  f'font-family:{SANS};font-size:16px;line-height:1.5;color:{INK};">{inline(it["text"])}</div>')
         if it.get("image"):
-            inner += f'<div style="text-align:center;margin:0 0 12px 0;">{image_tag(x, it["image"], int(it.get("image_width", 200)), it["text"][:60], extra="margin:0 auto;")}</div>'
-    return out + row(inner, pad="12px 20px") + divider(x)
+            inner += f'<div style="margin:0 0 16px 17px;">{image_tag(x, it["image"], int(it.get("image_width", 220)), it["text"][:60])}</div>'
+    return row(inner)
 
 
 def b_sponsors(x, s):
-    out = feature_bar(x, s.get("heading") or x.p["section_titles"]["sponsors"], bg=x.c["sponsors_bar"])
-    inner = "".join(
-        f'<p dir="auto" style="margin:0 0 14px 0;font-family:{FONT};font-size:16px;color:{x.c["text"]};text-align:center;line-height:1.3;">{inline(it)}</p>'
-        for it in s["items"])
+    inner = h2(s.get("heading") or x.p["section_titles"]["sponsors"])
+    inner += "".join(f'<p dir="auto" style="margin:0 0 12px 0;font-family:{SANS};font-size:16px;line-height:1.5;color:{INK};">{inline(it)}</p>' for it in s["items"])
     if s.get("contact"):
         ct = s["contact"]
-        inner += (f'<p style="margin:6px 0 0 0;font-family:{FONT};font-size:14px;font-style:italic;color:{x.c["text"]};text-align:center;">{html.escape(ct["text"])} '
-                  f'<a href="mailto:{html.escape(ct["email"])}" style="color:{x.c["footer_heading"]};">{html.escape(ct["name"])}</a></p>')
-    return out + row(inner, pad="14px 20px") + divider(x)
+        inner += (f'<p style="margin:16px 0 0 0;font-family:{SANS};font-size:14px;color:{MUTED};">{html.escape(ct["text"])} '
+                  f'<a href="mailto:{html.escape(ct["email"])}" style="color:{x.c["accent_text"]};font-weight:bold;">{html.escape(ct["name"])}</a></p>')
+    return row(inner)
 
 
 def b_photos(x, s):
-    out = feature_bar(x, s.get("heading") or x.p["section_titles"]["photos"])
-    inner = ""
-    for album in s["albums"]:
+    inner = h2(s.get("heading") or x.p["section_titles"]["photos"])
+    half = (INNER - 10) // 2
+    for n, album in enumerate(s["albums"]):
+        cap = album.get("caption") or "Photo"
         if album.get("caption"):
-            inner += f'<p dir="auto" style="margin:14px 0 10px 0;font-family:{FONT};font-size:16px;font-weight:bold;color:{x.c["text"]};text-align:center;">{inline(album["caption"])}</p>'
-        photos = album["photos"]
-        pend = []  # portraits waiting for a partner
+            inner += (f'<div dir="auto" style="font-family:{SANS};font-size:16px;font-weight:bold;color:{INK};'
+                      f'margin:{8 if n else 0}px 0 12px 0;">{inline(album["caption"])}</div>')
+        pend = []
 
-        def flush_pair():
+        def flush():
             nonlocal inner
             if len(pend) == 2:
-                inner += ('<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
-                          + "".join(f'<td class="stack" width="50%" align="center" valign="top" style="padding:0 5px 10px 5px;">{image_tag(x, p, 270, album.get("caption") or "Photo", extra="margin:0 auto;")}</td>' for p in pend)
-                          + '</tr></table>')
+                inner += ('<table role="presentation" class="pair" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:0 0 10px 0;"><tr>'
+                          f'<td class="stack" width="{half}" valign="top" style="padding:0 5px 0 0;">{image_tag(x, pend[0], half, cap, cls="full")}</td>'
+                          f'<td class="stack" width="{half}" valign="top" style="padding:0 0 0 5px;">{image_tag(x, pend[1], half, cap, cls="full")}</td>'
+                          '</tr></table>')
             elif len(pend) == 1:
-                inner += f'<div style="text-align:center;padding:0 0 10px 0;">{image_tag(x, pend[0], 320, album.get("caption") or "Photo", extra="margin:0 auto;")}</div>'
+                inner += f'<div style="margin:0 0 10px 0;">{image_tag(x, pend[0], INNER, cap)}</div>'
             pend.clear()
 
-        for p in photos:
+        for p in album["photos"]:
             w, h = img_dims(p, x.base)
             if w >= h * 1.05:
-                flush_pair()
-                inner += f'<div style="text-align:center;padding:0 0 10px 0;">{image_tag(x, p, 560, album.get("caption") or "Photo", extra="margin:0 auto;")}</div>'
+                flush()
+                inner += f'<div style="margin:0 0 10px 0;">{image_tag(x, p, INNER, cap)}</div>'
             else:
                 pend.append(p)
                 if len(pend) == 2:
-                    flush_pair()
-        flush_pair()
-    return out + row(inner, pad="0 20px 10px 20px") + divider(x)
+                    flush()
+        flush()
+        inner += '<div style="height:14px;line-height:14px;font-size:0;">&nbsp;</div>'
+    return row(inner)
 
 
 def b_text(x, s):
-    out = section_bar(x, s["heading"], s.get("byline")) if s.get("heading") else ""
-    return out + row(paragraphs(s["body"], x.c["text"], align=s.get("align", "left")), pad="12px 20px 2px 20px") + divider(x)
+    inner = h2(s["heading"]) if s.get("heading") else ""
+    inner += byline_row(x, s.get("byline"), s.get("image"))
+    return row(inner + body_text(s["body"], serif=s.get("serif", True)))
 
 
 def b_footer(x):
-    p, c = x.p, x.c
+    p = x.p
     d = p["donate"]
-    blurb = "".join(f'<p style="margin:0 0 4px 0;font-family:{FONT};font-size:14px;color:{c["text"]};text-align:center;">{html.escape(l)}</p>' for l in d["blurb"])
-    button = (f'<table role="presentation" align="center" border="0" cellpadding="0" cellspacing="0" style="margin:10px auto 0 auto;"><tr>'
-              f'<td bgcolor="{c["button"]}" style="background-color:{c["button"]};border-radius:2px;padding:10px 24px;">'
-              f'<a href="{html.escape(d["url"])}" target="_blank" style="font-family:{FONT};font-size:14px;font-weight:bold;color:#FFFFFF;text-decoration:none;">{html.escape(d["label"])}</a></td></tr></table>')
-    out = row(blurb + button, pad="16px 20px", align="center") + divider(x)
+    lines = list(d["blurb"])
+    band = ""
+    if lines:
+        band += f'<div style="font-family:{SERIF};font-size:22px;line-height:1.3;font-weight:bold;color:#FFFFFF;margin:0 0 8px 0;">{html.escape(lines[0])}</div>'
+        band += "".join(f'<div style="font-family:{SANS};font-size:15px;line-height:1.5;color:#D5D8EE;">{html.escape(l)}</div>' for l in lines[1:])
+        band += '<div style="height:18px;line-height:18px;font-size:0;">&nbsp;</div>'
+    band += button(x, d["label"], d["url"], bg=GOLD, fg=NAVY, center=True)
+    band = f'<table role="presentation" align="center" border="0" cellpadding="0" cellspacing="0"><tr><td align="center" style="text-align:center;">{band}</td></tr></table>'
+    out = row(band, bg=NAVY, pad=f"32px {PAD}px", align="center")
 
-    def h(t):
-        return f'<div style="font-family:{FONT};font-size:22px;font-weight:bold;color:{c["footer_heading"]};margin:0 0 10px 0;">{t}</div>'
+    def label(t):
+        return (f'<div style="font-family:{SANS};font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;'
+                f'color:{x.c["accent_text"]};margin:0 0 12px 0;">{t}</div>')
 
     def person(s):
         name, role, org, email = s
-        return (f'<p style="margin:0 0 10px 0;font-family:{FONT};font-size:11px;line-height:1.35;color:{c["text"]};">'
-                f'<strong>{html.escape(name)}</strong><br>{html.escape(role)}<br>{html.escape(org)}<br>'
-                f'<a href="mailto:{html.escape(email)}" style="color:{c["text"]};">{html.escape(email)}</a></p>')
+        role, org = html.escape(role), html.escape(org)
+        role_org = f"{role} {org}" if role.endswith(" of") else f"{role}<br>{org}"
+        return (f'<p style="margin:0 0 14px 0;font-family:{SANS};font-size:12px;line-height:1.5;color:{MUTED};">'
+                f'<strong style="color:{INK};font-size:13px;">{html.escape(name)}</strong><br>{role_org}<br>'
+                f'<a href="mailto:{html.escape(email)}" style="color:{x.c["accent_text"]};text-decoration:none;">{html.escape(email)}</a></p>')
     half = (len(p["staff"]) + 1) // 2
     staff = (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
-             f'<td class="stack" width="50%" valign="top">{"".join(person(s) for s in p["staff"][:half])}</td>'
+             f'<td class="stack" width="50%" valign="top" style="padding:0 10px 0 0;">{"".join(person(s) for s in p["staff"][:half])}</td>'
              f'<td class="stack" width="50%" valign="top">{"".join(person(s) for s in p["staff"][half:])}</td></tr></table>')
-    out += row(h("OUR STAFF") + staff, pad="14px 20px 4px 20px") + divider(x)
-
     ct = p["contact"]
-    tel = lambda n: f'<a href="tel:{n}" style="color:{c["text"]};text-decoration:none;">{n}</a>'
-    contact = (f'<p style="margin:0;font-family:{FONT};font-size:12px;line-height:1.5;color:{c["text"]};">'
-               f'<strong style="font-size:14px;">{html.escape(ct["name"])}</strong><br>'
-               f'<strong>Israel Address &amp; Phone:</strong> {html.escape(ct["israel"])} | {" | ".join(tel(n) for n in ct["israel_phones"])}<br>'
-               f'<strong>NY Office Address &amp; Phone:</strong> {html.escape(ct["ny"])} | {tel(ct["ny_phone"])}<br>'
-               f'<strong>Email:</strong> <a href="mailto:{ct["email"]}" style="color:{c["text"]};">{ct["email"]}</a> | '
-               f'<strong>Website:</strong> <a href="{ct["website_url"]}" target="_blank" style="color:{c["text"]};">{ct["website"]}</a></p>')
-    out += row(h("CONTACT US") + contact, pad="14px 20px") + divider(x)
-
+    tel = lambda n: f'<a href="tel:{n}" style="color:{MUTED};text-decoration:none;">{n}</a>'
+    contact = (f'<p style="margin:0;font-family:{SANS};font-size:12px;line-height:1.7;color:{MUTED};">'
+               f'<strong style="color:{INK};font-size:13px;">{html.escape(ct["name"])}</strong><br>'
+               f'Israel: {html.escape(ct["israel"])} · {" · ".join(tel(n) for n in ct["israel_phones"])}<br>'
+               f'New York: {html.escape(ct["ny"])} · {tel(ct["ny_phone"])}<br>'
+               f'<a href="mailto:{ct["email"]}" style="color:{x.c["accent_text"]};text-decoration:none;">{ct["email"]}</a> · '
+               f'<a href="{ct["website_url"]}" target="_blank" style="color:{x.c["accent_text"]};text-decoration:none;">{ct["website"]}</a></p>')
     about = ("TVA is one of the many programs under the umbrella of Bnei Akiva, the pioneering Religious Zionist youth movement, "
-             "which has more than 50 years of experience running programs for young men and women in their year in Israel.",
+             "which has more than 50 years of experience running programs for young men and women in their year in Israel. "
              "Bnei Akiva is your family in Israel. In addition to Israel programs, Bnei Akiva runs summer camps for thousands of young "
              "people, and year-round programs in dozens of communities in North America and across the world. On TVA, you will have "
              "the remarkable opportunity to connect with Bnei Akiva students from across the world - from the UK, Australia, South "
              "Africa, Germany, France, South America, and more!")
-    atext = "".join(f'<p style="margin:0 0 8px 0;font-family:{FONT};font-size:11px;line-height:1.4;color:{c["text"]};">{t}</p>' for t in about)
-    logo = image_tag(x, p["assets"]["about_logo"], 98, "Bnei Akiva")
-    out += row(h("ABOUT BNEI AKIVA") + f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
-               f'<td class="stack" width="98" valign="middle" style="padding:0 15px 0 0;">{logo}</td><td class="stack" valign="middle">{atext}</td></tr></table>',
-               pad="14px 20px")
+    logo = image_tag(x, p["assets"]["about_logo"], 64, "Bnei Akiva", radius=0)
+    about_t = (f'<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'
+               f'<td width="64" valign="top" style="padding:0 16px 0 0;">{logo}</td>'
+               f'<td valign="top" style="font-family:{SANS};font-size:12px;line-height:1.6;color:{MUTED};">{about}</td></tr></table>')
+    sep = f'<div style="height:1px;line-height:1px;font-size:0;background-color:{RULE};margin:22px 0;">&nbsp;</div>'
+    social = ""
     if p.get("social"):
-        icons = "".join(f'<a href="{u}" target="_blank" style="text-decoration:none;"><img src="{i}" width="32" alt="{n}" border="0" style="display:inline-block;width:32px;height:32px;margin:0 4px;"></a>' for n, u, i in p["social"])
-        out += row(f'<div style="font-family:{FONT};font-size:12px;color:#FFFFFF;margin-bottom:6px;">STAY CONNECTED</div>{icons}', bg=c["frame"], pad="10px 20px", align="center")
+        social = sep + "".join(f'<a href="{u}" target="_blank" style="text-decoration:none;"><img src="{i}" width="28" height="28" alt="{n}" border="0" style="display:inline-block;width:28px;height:28px;margin:0 6px 0 0;"></a>' for n, u, i in p["social"])
+    out += row(label("Our staff") + staff + sep + label("Contact us") + contact + sep + label("About Bnei Akiva") + about_t + social,
+               bg=FOOT, pad=f"32px {PAD}px")
     return out
 
+
+CARDS = {"announcement", "birthdays"}
 
 BLOCKS = {"article": b_article, "video": b_video, "media": b_media, "podcasts": b_media,
           "announcement": b_announcement, "birthdays": b_birthdays, "mazal_tov": b_mazal_tov,
           "sponsors": b_sponsors, "photos": b_photos, "text": b_text}
+
+
+def toc_label(x, s):
+    t = s["type"]
+    titles = x.p["section_titles"]
+    if t in ("article", "video", "text"):
+        return s.get("heading")
+    return {"media": s.get("heading") or titles["podcasts"], "podcasts": s.get("heading") or titles["podcasts"],
+            "photos": s.get("heading") or titles["photos"], "mazal_tov": s.get("heading") or titles["mazal_tov"],
+            "birthdays": "Birthdays", "sponsors": "Sponsors",
+            "announcement": "Announcements"}.get(t)
 
 
 # ---------------------------------------------------------------- document
@@ -398,45 +483,59 @@ def build(issue, base, preview=False):
             sys.exit(f"No parsha this Shabbat ({', '.join(hdr.get('holidays', [])) or 'unknown'}): set \"title\" (and \"parsha\" for the subject) in issue.json")
         issue["title"] = f"{hdr['special']} - {parsha}" if hdr.get("special") else f"Shabbat {parsha}"
     day = ordinal(friday.day) if prog.get("date_ordinal") else str(friday.day)
-    hdr["date_line"] = issue.get("date_line") or f"{friday.strftime('%B')} {day}, {friday.year} | {hdr.get('hebrew_date', '')}".rstrip(" |")
+    hdr["date_text"] = f"{friday.strftime('%B')} {day}, {friday.year}"
+    hdr["date_line"] = issue.get("date_line") or " | ".join(p for p in (hdr["date_text"], hdr.get("hebrew_date")) if p)
     hdr["candles"] = issue.get("candles") or hdr.get("candles")
     fields = {"parsha": parsha or issue["title"], "date": friday.isoformat(), "hebrew_year": hdr.get("hebrew_year", "")}
     subject = issue.get("subject") or prog["subject"].format(**fields)
     preheader = issue.get("preheader") or f"{issue['title']} | {hdr['date_line']}"
     campaign_name = " ".join(prog["campaign_name"].format(**fields).split())
 
-    body = b_header(x, issue, hdr)
-    for s in issue["sections"]:
-        if s.get("skip"):
-            continue
+    sections = [s for s in issue["sections"] if not s.get("skip")]
+    for s in sections:
         if s["type"] not in BLOCKS:
             sys.exit(f"Unknown section type {s['type']!r}; use one of {sorted(BLOCKS)}")
+    toc = []
+    for s in sections:
+        lab = toc_label(x, s)
+        if lab and lab not in toc:
+            toc.append(lab)
+    body = b_header(x, issue, hdr, toc)
+    prev = None
+    for s in sections:
+        # hairline between plain sections; tinted cards carry their own separation
+        if prev and prev not in CARDS and s["type"] not in CARDS:
+            body += rule()
         body += BLOCKS[s["type"]](x, s)
-    body += b_footer(x)
+        prev = s["type"]
+    body += '<div style="height:12px;line-height:12px;font-size:0;">&nbsp;</div>' + b_footer(x)
 
-    c = prog["colors"]
     doc = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>{html.escape(subject)}</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light">
+<title>{html.escape(subject)}</title>
 <style>
 body {{ margin:0; padding:0; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }}
 table {{ border-collapse:collapse; }}
 img {{ -ms-interpolation-mode:bicubic; }}
 a[x-apple-data-detectors] {{ color:inherit !important; text-decoration:none !important; }}
 @media only screen and (max-width:640px) {{
-  .shell {{ width:100% !important; }}
-  .stack {{ display:block !important; width:100% !important; padding-left:0 !important; padding-right:0 !important; text-align:center !important; }}
+  .outer {{ padding:0 !important; }}
+  .shell {{ width:100% !important; border-radius:0 !important; }}
+  .px {{ padding-left:20px !important; padding-right:20px !important; }}
+  .card {{ padding:20px !important; }}
+  .h1 {{ font-size:27px !important; }}
+  .stack {{ display:block !important; width:100% !important; padding:0 0 10px 0 !important; }}
   .full {{ width:100% !important; height:auto !important; }}
-  .scale {{ max-width:100% !important; height:auto !important; margin-left:auto !important; margin-right:auto !important; }}
-  .float-img {{ float:none !important; width:100% !important; }}
-  .float-img td {{ padding:0 0 12px 0 !important; text-align:center !important; }}
+  .scale {{ max-width:100% !important; height:auto !important; }}
+  .hide-sm {{ display:none !important; }}
 }}
 </style></head>
-<body style="margin:0;padding:0;background-color:{c['page']};">
+<body style="margin:0;padding:0;background-color:{PAGE};">
 <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;color:transparent;">{html.escape(preheader)}</div>
-<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="{c['page']}" style="background-color:{c['page']};"><tr><td align="center" style="padding:15px 10px;">
-<table role="presentation" class="shell" width="620" border="0" cellpadding="0" cellspacing="0" style="width:620px;"><tr>
-<td bgcolor="#FFFFFF" style="background-color:#FFFFFF;border:10px solid {c['frame']};">
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="{PAGE}" style="background-color:{PAGE};"><tr><td class="outer" align="center" style="padding:24px 12px;">
+<table role="presentation" class="shell" width="{CARD_W}" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" style="width:{CARD_W}px;background-color:#FFFFFF;border-radius:12px;overflow:hidden;"><tr>
+<td style="padding:0;">
 {body}
 </td></tr></table>
 </td></tr></table>

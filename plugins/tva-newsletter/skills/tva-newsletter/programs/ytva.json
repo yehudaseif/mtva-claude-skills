@@ -5,17 +5,9 @@
   "subject": "Shabbat Shalom from YTVA - {parsha}",
   "campaign_name": "YTVA Newsletter - {parsha} {hebrew_year} ({date})",
   "colors": {
-    "page": "#262E67",
-    "frame": "#40BFB4",
-    "date_band": "#294B93",
-    "section_bar": "#FFB014",
-    "feature_bar": "#FFB014",
-    "text": "#262E67",
-    "footer_heading": "#FBB040",
-    "birthday_bg": "#40BFB4",
-    "sponsors_bar": "#262E67",
-    "link_strip": "#34B3D0",
-    "button": "#40BFB4"
+    "accent": "#40BFB4",
+    "accent_text": "#16766E",
+    "tint": "#EAF7F6"
   },
   "assets": {
     "header": "https://files.constantcontact.com/da3b95bc001/0f702d36-b5b7-44dd-b9e9-ed936b7a880e.jpg?rdr=true",
