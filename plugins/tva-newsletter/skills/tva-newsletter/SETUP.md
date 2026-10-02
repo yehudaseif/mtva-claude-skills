@@ -56,20 +56,32 @@ lists are wrong, run `python3 cc.py lists` and edit `contact_list_ids` in the co
 
 ## 4. Photo hosting (the `image_host` section)
 
-Constant Contact's API has no way to upload images, so the photos are put somewhere
-public and the email links to them. Recommended: a Cloudflare R2 bucket (free at this volume).
+Constant Contact's API cannot upload images, so the photos go to a Cloudflare R2 bucket
+and the email links to them. **This is already set up** for TVA: bucket `tva-newsletter`
+in Cloudflare account `yehudaseif@gmail.com`, served at `https://img.mtvaisrael.org`.
+A new computer only needs the upload key (Access Key ID + Secret Access Key) in its
+config — ask for it, or create a new one:
 
-1. Cloudflare dashboard → **R2** → **Create bucket** `tva-newsletter`.
-2. Bucket → **Settings** → **Public access** → enable the **r2.dev subdomain**. Copy the
-   `https://pub-….r2.dev` URL into `public_base_url`.
-3. R2 → **Manage API tokens** → **Create API token** → permission **Object Read & Write**,
-   only this bucket. Copy the **Access Key ID** and **Secret Access Key** into the config,
-   and the **Account ID** (R2 overview page) into `account_id`.
+1. Cloudflare dashboard → **R2 Object Storage** → **Manage API Tokens** →
+   **Create Account API token** → **Object Read & Write** → **Apply to specific buckets
+   only: tva-newsletter** → Create.
+2. Copy the **Access Key ID** and **Secret Access Key** (shown once) into
+   `image_host` in the config:
+   ```json
+   "image_host": {"type": "r2", "account_id": "b86ed1a6b67e0a04c58667cf5ef15dc0",
+     "bucket": "tva-newsletter", "access_key_id": "…", "secret_access_key": "…",
+     "public_base_url": "https://img.mtvaisrael.org", "prefix": "newsletter"}
+   ```
+Never email the secret in plain text; share it through a password manager.
 
-No Cloudflare? Set `"image_host": {"type": "manual"}`. Each week the script then puts
-the resized photos in `out/img/`; upload them to the Constant Contact Library, paste
-each file's URL into `out/upload-urls.json`, and run it again. It works, but it is the
-slow part — R2 makes it automatic.
+How it was built, for the record: R2 enabled on the account; bucket created; Settings →
+Custom Domains → `img.mtvaisrael.org` (Cloudflare adds the CNAME itself). Right after
+enabling R2 the upload endpoint refused TLS for ~5 minutes until its certificate
+was issued — a handshake failure on first use is that, not bad keys.
+
+No key at all? `"image_host": {"type": "manual"}` still works: upload `out/img/` to the
+Constant Contact Library (SKILL.md section 5b) and paste the URLs into
+`out/upload-urls.json`.
 
 ## 5. Test it
 
