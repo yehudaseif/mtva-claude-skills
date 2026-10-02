@@ -31,9 +31,14 @@ Constant Contact's API cannot be used without a registered "application". It is 
 
 1. Sign in at <https://app.constantcontact.com/pages/dma/portal/> (the developer portal)
    with the Constant Contact login that sends the newsletters.
-2. **New Application** → name it `TVA Newsletter` → flow: **Authorization Code Flow
-   with PKCE** (no client secret) → refresh tokens: **Long Lived**.
-3. Add the redirect URI exactly: `http://localhost:8765/callback`
+2. **New Application** → name it `TVA Newsletter` → flow: **Proof Key for Code
+   Exchange (PKCE)** (no client secret). Refresh tokens: **Rotating** is the only choice
+   with PKCE; the script saves each new token automatically. Log into the portal while
+   the **Bnei Akiva of the US & Canada** workspace is selected: a new app is limited to
+   the account you are in.
+3. **Edit** the app → pencil next to the redirect URI → `http://localhost:8766/callback`
+   → Confirm → **Save**. (If something else on the computer already uses port 8766,
+   pick another port and use it in both the portal and `redirect_uri` in the config.)
 4. Copy the **API Key** into `client_id` in the config.
 
 Then connect, and copy the sender and recipient lists from last week's real emails:

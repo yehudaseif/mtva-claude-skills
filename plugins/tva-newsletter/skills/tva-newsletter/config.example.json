@@ -2,7 +2,7 @@
   "drop_root": "~/Documents/TVA Newsletter",
   "constant_contact": {
     "client_id": "PASTE-API-KEY-FROM-CONSTANT-CONTACT-DEVELOPER-PORTAL",
-    "redirect_uri": "http://localhost:8765/callback"
+    "redirect_uri": "http://localhost:8766/callback"
   },
   "programs": {
     "mtva": { "test_recipients": ["office@tvaisrael.org"] },

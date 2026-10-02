@@ -25,6 +25,7 @@ try:
 except ImportError:
     sys.exit("Pillow is required: pip3 install pillow")
 
+UA = {"User-Agent": "tva-newsletter/0.2 (+https://github.com/yehudaseif/mtva-claude-skills)"}
 CONFIG = Path.home() / ".config" / "tva-newsletter" / "config.json"
 PROGRAMS = Path(__file__).resolve().parent.parent / "programs"
 # max pixel width per role (2x the display width, for sharp phones)
@@ -132,7 +133,7 @@ def r2_put(cfg, key, data, ctype="image/jpeg"):
 
 def verify(url):
     try:
-        r = urllib.request.urlopen(urllib.request.Request(url, method="HEAD"), timeout=20)
+        r = urllib.request.urlopen(urllib.request.Request(url, method="HEAD", headers=UA), timeout=20)
         return r.status == 200 and r.headers.get("content-type", "").startswith("image/")
     except Exception:
         return False
@@ -169,7 +170,7 @@ def main():
         ref = cont[key]
         if role == "avatar" and isinstance(ref, str) and (ref in known or ref.startswith("http")):
             # headshots on file are not square: fetch and crop them like any other
-            raw = urllib.request.urlopen(known.get(ref, ref), timeout=30).read()
+            raw = urllib.request.urlopen(urllib.request.Request(known.get(ref, ref), headers=UA), timeout=30).read()
             src = outdir.parent / f"_src-{hashlib.sha1(ref.encode()).hexdigest()[:10]}.jpg"  # outside img/: not for upload
             src.write_bytes(raw)
         elif not is_local(ref, known):

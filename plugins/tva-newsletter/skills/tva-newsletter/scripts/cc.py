@@ -25,6 +25,8 @@ CONFIG, TOKENS = CFG_DIR / "config.json", CFG_DIR / "cc_tokens.json"
 AUTHZ = "https://authz.constantcontact.com/oauth2/default/v1"
 API = "https://api.cc.email/v3"
 SCOPES = "account_read contact_data campaign_data offline_access"
+# Constant Contact's edge rejects Python's default User-Agent with a 403 ("error code: 1010").
+UA = "tva-newsletter/0.2 (+https://github.com/yehudaseif/mtva-claude-skills)"
 
 
 def load_cfg():
@@ -46,7 +48,7 @@ def save_tokens(t):
 # ---------------------------------------------------------------- auth (PKCE)
 def cmd_auth(cfg, a):
     cc = cfg["constant_contact"]
-    redirect = cc.get("redirect_uri", "http://localhost:8765/callback")
+    redirect = cc.get("redirect_uri", "http://localhost:8766/callback")
     port = urllib.parse.urlparse(redirect).port or 80
     verifier = secrets.token_urlsafe(64)
     challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b"=").decode()
@@ -86,7 +88,7 @@ def cmd_auth(cfg, a):
 
 def post_form(url, data):
     req = urllib.request.Request(url, data=urllib.parse.urlencode(data).encode(), method="POST",
-                                 headers={"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"})
+                                 headers={"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json", "User-Agent": UA})
     try:
         return json.load(urllib.request.urlopen(req, timeout=30))
     except urllib.error.HTTPError as e:
@@ -102,7 +104,7 @@ def access_token(cfg):
     cc = cfg["constant_contact"]
     new = post_form(f"{AUTHZ}/token", {"client_id": cc["client_id"], "refresh_token": t["refresh_token"],
                                         "grant_type": "refresh_token",
-                                        "redirect_uri": cc.get("redirect_uri", "http://localhost:8765/callback")})
+                                        "redirect_uri": cc.get("redirect_uri", "http://localhost:8766/callback")})
     new.setdefault("refresh_token", t["refresh_token"])
     save_tokens(new)
     return new["access_token"]
@@ -112,7 +114,7 @@ def api(cfg, method, path, body=None):
     req = urllib.request.Request(API + path, method=method,
                                  data=json.dumps(body).encode() if body is not None else None,
                                  headers={"Authorization": f"Bearer {access_token(cfg)}", "Accept": "application/json",
-                                          "Content-Type": "application/json"})
+                                          "Content-Type": "application/json", "User-Agent": UA})
     try:
         r = urllib.request.urlopen(req, timeout=60)
         raw = r.read()
