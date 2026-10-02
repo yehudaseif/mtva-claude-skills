@@ -111,7 +111,8 @@ something seems missing, say so rather than writing it.
 python3 scripts/render.py ".../MTVA/issue.json" --preview
 ```
 It pulls the parsha, Hebrew date and Jerusalem candle lighting (40 min) from Hebcal and
-prints the subject. Then **look at it**: render `out/preview.html` to a PNG with headless
+prints the subject. If the staff-supplied time differs from Hebcal's (it happens — the
+Shmini Atzeret 5787 draft said 5:48, Hebcal 5:43), use theirs via `"candles"` and flag it. Then **look at it**: render `out/preview.html` to a PNG with headless
 Chrome (`"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new
 --hide-scrollbars --window-size=800,12000 --screenshot=out/preview.png file://…`) and read
 the image. Check the header line, every section is present and in order, photos are the
@@ -142,6 +143,50 @@ python3 scripts/cc.py schedule ".../MTVA" --at "2026-10-09 13:30" --confirm   # 
 ```
 Without `--confirm` it only prints what it would do. Never add `--confirm` on your own
 initiative, and never schedule from a recurring/automated run.
+
+## 5b. No API key yet? The browser route (Claude in Chrome)
+
+Works today with only a logged-in Constant Contact tab. Every step below was learned
+the hard way; follow it literally.
+
+1. **Find the workspace.** The login is a multi-account *hub*. The newsletters live in
+   the workspace **Bnei Akiva of the US & Canada** (Premium, user `bana2018`). Deep links
+   such as `/pages/ecamp/emails` or `/pages/dashboard` 404 — open
+   `https://app.constantcontact.com/home`, use the **Hub** dropdown (top left) to switch
+   into that workspace, then **Campaigns**. Campaign names look like
+   `MTVA Shmini Atzeret 5787` / `YTVA Parashat Haazinu 2026-7`.
+2. **Reading an existing draft** (when content was entered in Constant Contact): row
+   menu **…** → **Preview**. The email sits in a same-origin iframe. Tool output
+   truncates at ~1,000 characters and Chrome blocks posting to localhost, so serialise the
+   iframe body (text plus `**bold**`, `[IMG w= src=]`, `[text](href)` markers) into an
+   `<article>` you prepend to the page, read it with `get_page_text`, then remove it.
+   The Preview panel also shows the subject, From name and addresses.
+3. **Uploading images** (manual host): **Assets → Library → Upload → My Computer** opens
+   a cross-origin iframe. Navigate the tab to that iframe's `src`
+   (`legacy-mlui.constantcontact.com/mlui/upload/view?…tab=localUploadTab…`), then
+   `file_upload` all of `out/img/*.jpg` onto `#fileUploadSplash`, click **Upload Files**,
+   **Done**. Each file's public URL is
+   `https://files.constantcontact.com/da3b95bc001/<uuid>.jpg?rdr=true`, where `<uuid>` is
+   in the Library thumbnail path (`…/da3b95bc001/<uuid>-thumbnail.jpg`) on
+   `legacy-mlui.constantcontact.com/mlui/home` (newest first; **Show More** for the rest).
+   Download each URL and compare bytes with the local file before writing
+   `out/upload-urls.json`.
+4. **Creating the email**: **Create a campaign → Email → Paste your own code (Paste
+   HTML)**. The editor is CodeMirror 5. Put the HTML on the clipboard with
+   **`LANG=en_US.UTF-8 pbcopy < out/email.html`** — without `LANG`, pbcopy reads the file
+   as Mac Roman and silently mangles `·`, curly quotes and all Hebrew. Focus the editor,
+   `CodeMirror.execCommand('selectAll')`, press cmd+v, then confirm the SHA-256 of
+   `CodeMirror.getValue()` (UTF-8) equals `shasum -a 256 out/email.html`.
+5. **Email Settings** (link above the editor): subject, From name
+   (`Midreshet Torah V'Avodah` / `Yeshivat Torah V'Avodah`), reply-to
+   `office@tvaisrael.org`. The From-address list for new emails only offers authenticated
+   `*@bneiakiva.ccsend.com` senders (use `tvaoffice@bneiakiva.ccsend.com`); the existing
+   MTVA drafts show `office@tvaisrael.org`, so check with the office which is right before
+   a live send. Dropdown lists scroll — zoom and confirm the selected value after clicking.
+   Rename the draft (pencil by the title), **Save**, **Check & Preview → Check For Errors**,
+   then **Preview**, which also has the **Send test** box.
+6. Test sends and scheduling follow the same rules as section 5: a test only to
+   addresses the user names, the real send only on an explicit go-ahead.
 
 ## 6. Report back
 

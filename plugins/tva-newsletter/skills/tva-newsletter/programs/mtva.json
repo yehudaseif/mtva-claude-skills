@@ -3,7 +3,7 @@
   "short": "MTVA",
   "name": "Midreshet Torah V'Avodah",
   "subject": "Shabbat Shalom from MTVA - {parsha}",
-  "campaign_name": "MTVA Newsletter - {parsha} {hebrew_year} ({date})",
+  "campaign_name": "MTVA {parsha} {hebrew_year}",
   "colors": {
     "accent": "#9E1F63",
     "accent_text": "#9E1F63",

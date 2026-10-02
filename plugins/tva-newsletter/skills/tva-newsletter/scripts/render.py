@@ -388,6 +388,11 @@ def b_photos(x, s):
     return row(inner)
 
 
+def b_image(x, s):
+    """A standalone graphic (chag greeting, banner) with an optional link."""
+    return row(image_tag(x, s["image"], INNER, s.get("alt") or "Image", link=s.get("url"), radius=10), pad=f"8px {PAD}px 24px {PAD}px")
+
+
 def b_text(x, s):
     inner = h2(s["heading"]) if s.get("heading") else ""
     inner += byline_row(x, s.get("byline"), s.get("image"))
@@ -449,11 +454,11 @@ def b_footer(x):
     return out
 
 
-CARDS = {"announcement", "birthdays"}
+CARDS = {"announcement", "birthdays", "image"}
 
 BLOCKS = {"article": b_article, "video": b_video, "media": b_media, "podcasts": b_media,
           "announcement": b_announcement, "birthdays": b_birthdays, "mazal_tov": b_mazal_tov,
-          "sponsors": b_sponsors, "photos": b_photos, "text": b_text}
+          "sponsors": b_sponsors, "photos": b_photos, "text": b_text, "image": b_image}
 
 
 def toc_label(x, s):
@@ -486,7 +491,9 @@ def build(issue, base, preview=False):
     hdr["date_text"] = f"{friday.strftime('%B')} {day}, {friday.year}"
     hdr["date_line"] = issue.get("date_line") or " | ".join(p for p in (hdr["date_text"], hdr.get("hebrew_date")) if p)
     hdr["candles"] = issue.get("candles") or hdr.get("candles")
-    fields = {"parsha": parsha or issue["title"], "date": friday.isoformat(), "hebrew_year": hdr.get("hebrew_year", "")}
+    sy = friday.year if friday.month >= 8 else friday.year - 1
+    fields = {"parsha": parsha or issue["title"], "date": friday.isoformat(), "hebrew_year": hdr.get("hebrew_year", ""),
+              "school_year": f"{sy}-{(sy + 1) % 10}"}
     subject = issue.get("subject") or prog["subject"].format(**fields)
     preheader = issue.get("preheader") or f"{issue['title']} | {hdr['date_line']}"
     campaign_name = " ".join(prog["campaign_name"].format(**fields).split())

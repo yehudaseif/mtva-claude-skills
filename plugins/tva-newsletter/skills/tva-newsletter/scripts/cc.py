@@ -222,7 +222,7 @@ def cmd_draft(cfg, a):
     camp = {"name": body["name"], "campaign_id": c["campaign_id"], "activity_id": aid, "created": dt.datetime.now().isoformat(timespec="seconds")}
     camp_f.write_text(json.dumps(camp, indent=2))
     print(f"draft created: {camp['name']!r}\n  campaign {c['campaign_id']}\n  recipients: {act.get('segment_ids') or act.get('contact_list_ids')}")
-    print("  open it: https://app.constantcontact.com/pages/ecamp/emails  (Campaigns -> Drafts)")
+    print("  find it under Campaigns in the Bnei Akiva of the US & Canada workspace (app.constantcontact.com/home -> Hub dropdown)")
 
 
 def cmd_test(cfg, a):

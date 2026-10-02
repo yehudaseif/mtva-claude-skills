@@ -3,7 +3,7 @@
   "short": "YTVA",
   "name": "Yeshivat Torah V'Avodah",
   "subject": "Shabbat Shalom from YTVA - {parsha}",
-  "campaign_name": "YTVA Newsletter - {parsha} {hebrew_year} ({date})",
+  "campaign_name": "YTVA {parsha} {school_year}",
   "colors": {
     "accent": "#40BFB4",
     "accent_text": "#16766E",

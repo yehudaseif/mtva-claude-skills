@@ -42,7 +42,7 @@ def walk(issue):
         t = s["type"]
         if t in ("article", "video", "text") and s.get("image"):
             yield s, "image", "avatar"
-        if t == "announcement" and s.get("image"):
+        if t in ("announcement", "image") and s.get("image"):
             yield s, "image", "flyer"
         if t == "video" and s.get("thumbnail"):
             yield s, "thumbnail", "video"
@@ -158,7 +158,7 @@ def main():
         if s["type"] == "video" and not s.get("thumbnail"):
             raw = youtube_thumb(s["url"])
             if raw:
-                p = outdir / "_yt_source.jpg"
+                p = outdir.parent / "_yt_source.jpg"
                 p.write_bytes(raw)
                 s["thumbnail"] = str(p)
 
@@ -170,7 +170,7 @@ def main():
         if role == "avatar" and isinstance(ref, str) and (ref in known or ref.startswith("http")):
             # headshots on file are not square: fetch and crop them like any other
             raw = urllib.request.urlopen(known.get(ref, ref), timeout=30).read()
-            src = outdir / f"_src-{re.sub(r'[^a-z0-9]+', '-', ref.lower())[:30]}.jpg"
+            src = outdir.parent / f"_src-{hashlib.sha1(ref.encode()).hexdigest()[:10]}.jpg"  # outside img/: not for upload
             src.write_bytes(raw)
         elif not is_local(ref, known):
             continue
@@ -181,7 +181,8 @@ def main():
             missing.append(str(src))
             continue
         data, (w, h) = prepare(src, role)
-        name = f"{re.sub(r'[^a-z0-9]+', '-', src.stem.lower()).strip('-')[:40]}-{hashlib.sha1(data).hexdigest()[:8]}.jpg"
+        stem = "headshot" if src.stem.startswith("_src-") else re.sub(r'[^a-z0-9]+', '-', src.stem.lower()).strip('-')[:40]
+        name = f"{stem}-{hashlib.sha1(data).hexdigest()[:8]}.jpg"
         (outdir / name).write_bytes(data)
         todo.append((cont, key, name, w, h, len(data)))
     if missing:
