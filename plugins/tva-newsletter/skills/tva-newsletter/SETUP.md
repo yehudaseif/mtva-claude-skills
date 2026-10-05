@@ -9,7 +9,7 @@ test emails, say when to send.
 ```bash
 claude plugin marketplace add yehudaseif/mtva-claude-skills
 claude plugin install tva-newsletter@mtva-skills
-pip3 install pillow
+pip3 install pillow tzdata   # tzdata: needed on Windows for the send-time conversion
 ```
 (Or, from the zip: unzip it into `~/.claude/skills/` so you have
 `~/.claude/skills/tva-newsletter/SKILL.md`.)
