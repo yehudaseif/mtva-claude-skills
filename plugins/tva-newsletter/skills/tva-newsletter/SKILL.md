@@ -188,6 +188,35 @@ the hard way; follow it literally.
 6. Test sends and scheduling follow the same rules as section 5: a test only to
    addresses the user names, the real send only on an explicit go-ahead.
 
+## 5c. Changes after the draft exists (editor or reviewer)
+
+The week folder is usually a **shared** folder (Google Drive), so the editor (Aliza for
+MTVA, Aliya for YTVA) and the reviewer (Michelle) work on the same files. Whoever asks
+for a change, the same rules apply:
+
+- If `issue.json` already exists for that program and week, it is the **source of
+  truth**. Change it in place. Never rebuild it from the drop folder unless the user
+  explicitly asks to start over — that would silently undo someone else's fixes. Read
+  `changes.md` first to see what others already changed.
+- Make only the change asked for. For the authors' words, a requested correction (a
+  name, a year, a typo the user points out) is fine; still no unrequested rewording.
+- Then: `images.py` (only new photos upload; existing ones are reused) → `render.py
+  issue.hosted.json` → `cc.py draft` (updates the **same** draft; it never makes a
+  second one while `out/campaign.json` exists) → `cc.py test`.
+- Append one plain line to `changes.md` saying who asked for what, e.g.
+  `- Mon 14:05 Michelle: Rivka Levi's year 5782 → 5783`. `cc.py draft` adds a timestamp
+  line on its own.
+- Drive sync can lag or revert a just-written file: re-read `issue.json` after saving
+  and before rendering.
+- If the newsletter is already **scheduled**, `cc.py draft` refuses to edit it. Run
+  `cc.py status`, tell the user it is scheduled and for when, and only with their OK run
+  `cc.py unschedule`, make the change, send a new test, and reschedule (which again
+  needs `--confirm` and an explicit time from the user). Never leave it unscheduled
+  silently: say clearly that it will not go out until it is scheduled again.
+- Two people editing the same week at the same minute will overwrite each other. If
+  `changes.md` shows an edit in the last few minutes by someone else, mention it before
+  saving.
+
 ## 6. Report back
 
 Per program: subject line, sections included (and any left out because the folder was

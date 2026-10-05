@@ -50,7 +50,7 @@
     {
       "name": "tva-newsletter",
       "description": "The weekly MTVA and YTVA Shabbat newsletters in Constant Contact. Staff drop the week's pieces (dvar Torah, update, photos, mazal tovs, birthdays, podcasts, flyers) in a folder; Claude fills each program's fixed house template, hosts the photos, and creates the draft and test send. Sending to families stays a human decision.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "MTVA"
       },

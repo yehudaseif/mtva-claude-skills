@@ -83,6 +83,23 @@ No key at all? `"image_host": {"type": "manual"}` still works: upload `out/img/`
 Constant Contact Library (SKILL.md section 5b) and paste the URLs into
 `out/upload-urls.json`.
 
+## 4b. Shared week folder (editor + reviewer)
+
+So the reviewer can fix a newsletter directly, everyone works in one shared folder:
+
+1. In Google Drive, create a folder **TVA Newsletter** and share it (Editor access) with
+   the MTVA editor, the YTVA editor and the reviewer.
+2. Each person installs **Google Drive for desktop** and signs in with the account it was
+   shared with. Add the shared folder to *My Drive* (right-click → Organize → Add shortcut)
+   so it syncs.
+3. In each person's `~/.config/tva-newsletter/config.json`, set `drop_root` to the synced
+   path, e.g. `~/Library/CloudStorage/GoogleDrive-name@tvaisrael.org/My Drive/TVA Newsletter`
+   (Mac) or `G:/My Drive/TVA Newsletter` (Windows). Claude can find and set it: ask
+   "point my newsletter folder at the shared TVA Newsletter folder in Google Drive".
+
+The Constant Contact draft is shared automatically (same account); `out/campaign.json` in
+the shared folder is what ties the week to its draft.
+
 ## 5. Test it
 
 ```bash

@@ -10,6 +10,8 @@ Weekly (after render.py has written out/email.html + out/meta.json):
   python3 cc.py draft  WEEK/MTVA             # create (or update) the draft campaign
   python3 cc.py test   WEEK/MTVA             # test-send to the program's test_recipients
   python3 cc.py schedule WEEK/MTVA --at "2026-10-09 14:00" --confirm   # Jerusalem time
+  python3 cc.py status WEEK/MTVA             # draft / scheduled / sent, and when
+  python3 cc.py unschedule WEEK/MTVA         # pull back a scheduled send so it can be edited
 
 Helpers: whoami | lists | recent [--days N]
 
@@ -195,10 +197,14 @@ def cmd_draft(cfg, a):
         camp = json.load(open(camp_f))
         act = api(cfg, "GET", f"/emails/activities/{camp['activity_id']}")
         if act.get("current_status", "").upper() not in ("DRAFT", "ERROR"):
-            sys.exit(f"Campaign is {act.get('current_status')}; it can no longer be edited.")
+            sys.exit(f"Campaign is {act.get('current_status')}. If it is SCHEDULED, run `cc.py unschedule` first "
+                     "(with the user's OK), edit, test, and schedule again. A SENT campaign cannot be changed.")
         act.update({"html_content": html, "subject": meta["subject"], "preheader": meta["preheader"]})
         api(cfg, "PUT", f"/emails/activities/{camp['activity_id']}", act)
-        print(f"updated draft {camp['name']!r}")
+        log = d / "changes.md"
+        with open(log, "a", encoding="utf-8") as f:
+            f.write(f"- {dt.datetime.now().strftime('%a %d %b %H:%M')} draft updated by {os.environ.get('USER', '?')}\n")
+        print(f"updated draft {camp['name']!r} (same campaign; nothing was sent)")
         return
     name = meta["campaign_name"]
     body = {"name": name, "email_campaign_activities": [{
@@ -260,6 +266,27 @@ def cmd_schedule(cfg, a):
     print("SCHEDULED.")
 
 
+def cmd_status(cfg, a):
+    d, meta = week_dir(a.folder)
+    camp = json.load(open(d / "out" / "campaign.json"))
+    act = api(cfg, "GET", f"/emails/activities/{camp['activity_id']}")
+    sched = api(cfg, "GET", f"/emails/activities/{camp['activity_id']}/schedules")
+    when = ", ".join(x.get("scheduled_date", "") for x in sched) if isinstance(sched, list) else ""
+    print(f"{camp['name']}: {act.get('current_status')}" + (f", scheduled for {when} (UTC)" if when else ""))
+
+
+def cmd_unschedule(cfg, a):
+    d, meta = week_dir(a.folder)
+    camp = json.load(open(d / "out" / "campaign.json"))
+    act = api(cfg, "GET", f"/emails/activities/{camp['activity_id']}")
+    if act.get("current_status", "").upper() != "SCHEDULED":
+        sys.exit(f"Not scheduled (status {act.get('current_status')}); nothing to undo.")
+    api(cfg, "DELETE", f"/emails/activities/{camp['activity_id']}/schedules")
+    camp.pop("scheduled", None)
+    (d / "out" / "campaign.json").write_text(json.dumps(camp, indent=2))
+    print(f"Unscheduled {camp['name']!r}. It is a draft again; it will NOT send until scheduled again with --confirm.")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sp = ap.add_subparsers(dest="cmd", required=True)
@@ -270,6 +297,8 @@ def main():
     i = sp.add_parser("inherit"); i.add_argument("program", choices=["mtva", "ytva"]); i.add_argument("--match", required=True); i.add_argument("--days", type=int, default=60)
     d = sp.add_parser("draft"); d.add_argument("folder")
     t = sp.add_parser("test"); t.add_argument("folder"); t.add_argument("--to", nargs="*")
+    st = sp.add_parser("status"); st.add_argument("folder")
+    u = sp.add_parser("unschedule"); u.add_argument("folder")
     s = sp.add_parser("schedule"); s.add_argument("folder"); s.add_argument("--at", required=True, help='"YYYY-MM-DD HH:MM" Jerusalem time, or "now"'); s.add_argument("--confirm", action="store_true")
     a = ap.parse_args()
     CFG_DIR.mkdir(parents=True, exist_ok=True)
