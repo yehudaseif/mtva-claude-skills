@@ -24,7 +24,21 @@ missing, stop and walk the user through `SETUP.md`.
 ## 1. Find the week
 
 `drop_root` in the config (default `~/Documents/TVA Newsletter`) holds one folder per
-Friday: `YYYY-MM-DD Parsha/MTVA/` and `.../YTVA/`. Create next week's empty folders
+Friday: `YYYY-MM-DD Parsha/MTVA/` and `.../YTVA/`.
+
+**The folder is shared in Google Drive** ("TVA Newsletter", owned by yehudaseif@gmail.com,
+shared with the MTVA editor, the YTVA editor and the reviewer). If `drop_root` in the
+config starts with `SET-ME`, find the synced copy and write its path into the config:
+on a Mac `~/Library/CloudStorage/GoogleDrive-<account>/My Drive/TVA Newsletter`, on Windows
+usually `G:/My Drive/TVA Newsletter`. A folder someone else shared only appears there after
+the person adds it to their Drive (in drive.google.com: Shared with me → TVA Newsletter →
+⋮ → Organize → Add shortcut → My Drive). If Google Drive for desktop isn't installed, say
+so and stop; don't create a local folder instead, or the others won't see the work.
+
+**Roles.** The config's `can_schedule` says whether this person may schedule. Editors
+(`false`) build and test; the reviewer (`true`, `scheduler_name`) reviews, may edit
+directly (section 5c), and schedules. When an editor's newsletter is ready, tell them
+it's waiting for the reviewer; don't offer to schedule. Create next week's empty folders
 with `python3 scripts/new_week.py [--date YYYY-MM-DD]` — staff fill them during the week.
 
 Work one program at a time. Read **every** file in its folder, including subfolders.

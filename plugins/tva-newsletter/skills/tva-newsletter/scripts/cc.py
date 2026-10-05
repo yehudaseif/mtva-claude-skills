@@ -245,7 +245,14 @@ def cmd_test(cfg, a):
     print(f"test sent to {', '.join(to)}")
 
 
+def require_scheduler(cfg):
+    if not cfg.get("can_schedule", True):
+        sys.exit(f"Scheduling is done by {cfg.get('scheduler_name', 'the reviewer')} in this setup. "
+                 "Build and test the newsletter; they review it and schedule it.")
+
+
 def cmd_schedule(cfg, a):
+    require_scheduler(cfg)
     d, meta = week_dir(a.folder)
     camp = json.load(open(d / "out" / "campaign.json"))
     if a.at == "now":
@@ -276,6 +283,7 @@ def cmd_status(cfg, a):
 
 
 def cmd_unschedule(cfg, a):
+    require_scheduler(cfg)
     d, meta = week_dir(a.folder)
     camp = json.load(open(d / "out" / "campaign.json"))
     act = api(cfg, "GET", f"/emails/activities/{camp['activity_id']}")

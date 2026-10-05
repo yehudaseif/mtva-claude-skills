@@ -57,7 +57,11 @@ def main():
     a = ap.parse_args()
     friday = dt.date.fromisoformat(a.date) if a.date else coming_friday()
     cfg = json.load(open(CONFIG)) if CONFIG.exists() else {}
-    root = Path(cfg.get("drop_root", "~/Documents/TVA Newsletter")).expanduser()
+    root = cfg.get("drop_root", "~/Documents/TVA Newsletter")
+    if root.startswith("SET-ME"):
+        raise SystemExit("drop_root is not set yet: point it at the shared 'TVA Newsletter' Google Drive "
+                         "folder on this computer (see SETUP.md 4b).")
+    root = Path(root).expanduser()
     week = root / f"{friday.isoformat()} {parsha(friday)}".strip()
     for prog in ("MTVA", "YTVA"):
         p = week / prog
