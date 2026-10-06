@@ -26,14 +26,15 @@ missing, stop and walk the user through `SETUP.md`.
 `drop_root` in the config (default `~/Documents/TVA Newsletter`) holds one folder per
 Friday: `YYYY-MM-DD Parsha/MTVA/` and `.../YTVA/`.
 
-**The folder is shared in Google Drive** ("TVA Newsletter", owned by yehudaseif@gmail.com,
-shared with the MTVA editor, the YTVA editor and the reviewer). If `drop_root` in the
-config starts with `SET-ME`, find the synced copy and write its path into the config:
-on a Mac `~/Library/CloudStorage/GoogleDrive-<account>/My Drive/TVA Newsletter`, on Windows
-usually `G:/My Drive/TVA Newsletter`. A folder someone else shared only appears there after
-the person adds it to their Drive (in drive.google.com: Shared with me → TVA Newsletter →
-⋮ → Organize → Add shortcut → My Drive). If Google Drive for desktop isn't installed, say
-so and stop; don't create a local folder instead, or the others won't see the work.
+**The folder is a Google Shared drive** called "TVA Newsletter" in the tvaisrael.org
+Workspace (members: the MTVA editor, the YTVA editor, the reviewer, and Yehuda). If
+`drop_root` in the config starts with `SET-ME`, find the synced copy and write its path
+into the config: on a Mac `~/Library/CloudStorage/GoogleDrive-<account>/Shared drives/TVA Newsletter`,
+on Windows usually `G:/Shared drives/TVA Newsletter`. Shared drives appear automatically
+once Google Drive for desktop is signed in with a member account; no shortcut is needed.
+If it isn't there, check which account Drive for desktop is signed into. If Drive for
+desktop isn't installed, say so and stop; don't create a local folder instead, or the
+others won't see the work.
 
 **Roles.** The config's `can_schedule` says whether this person may schedule. Editors
 (`false`) build and test; the reviewer (`true`, `scheduler_name`) reviews, may edit
