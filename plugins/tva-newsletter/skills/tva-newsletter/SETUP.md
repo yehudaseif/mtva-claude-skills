@@ -27,15 +27,16 @@ never commit or email it.
 
 ## 3. Constant Contact API key (the `constant_contact` section)
 
-Constant Contact's API cannot be used without a registered "application". It is free:
+**Every person needs their own app.** A private Constant Contact app works only for the
+login that created it; anyone else gets `access_denied — User is not assigned to the
+client application`. It is free and takes three minutes:
 
 1. Sign in at <https://app.constantcontact.com/pages/dma/portal/> (the developer portal)
-   with the Constant Contact login that sends the newsletters.
-2. **New Application** → name it `TVA Newsletter` → flow: **Proof Key for Code
-   Exchange (PKCE)** (no client secret). Refresh tokens: **Rotating** is the only choice
-   with PKCE; the script saves each new token automatically. Log into the portal while
-   the **Bnei Akiva of the US & Canada** workspace is selected: a new app is limited to
-   the account you are in.
+   with **your own** Constant Contact login, while the **Bnei Akiva of the US & Canada**
+   workspace is selected (a new app is limited to the account you are in).
+2. **New Application** → name it e.g. `TVA Newsletter – Aliza` → flow: **Proof Key for Code
+   Exchange (PKCE)**. Refresh tokens: **Rotating** is the only choice with PKCE; the
+   script saves each new token automatically.
 3. **Edit** the app → pencil next to the redirect URI → `http://localhost:8766/callback`
    → Confirm → **Save**. (If something else on the computer already uses port 8766,
    pick another port and use it in both the portal and `redirect_uri` in the config.)

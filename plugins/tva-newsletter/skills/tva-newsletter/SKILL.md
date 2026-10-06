@@ -21,6 +21,12 @@ Scripts are in `scripts/` next to this file (Python 3.9+, Pillow for images). Co
 the Constant Contact login live in `~/.config/tva-newsletter/`. If `config.json` is
 missing, stop and walk the user through `SETUP.md`.
 
+**Constant Contact app key: one per person.** A private developer-portal app only works for
+the login that created it (others get `access_denied — User is not assigned to the client
+application`). If `constant_contact.client_id` starts with `SET-ME`, or that error appears,
+help the user create their own app with SETUP.md step 3, using their browser (they sign in
+themselves), then put its API key in the config and run `cc.py auth`.
+
 ## 1. Find the week
 
 `drop_root` in the config (default `~/Documents/TVA Newsletter`) holds one folder per

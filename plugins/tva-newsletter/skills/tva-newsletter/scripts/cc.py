@@ -51,6 +51,10 @@ def save_tokens(t):
 def cmd_auth(cfg, a):
     cc = cfg["constant_contact"]
     redirect = cc.get("redirect_uri", "http://localhost:8766/callback")
+    if not cc.get("client_id") or cc["client_id"].startswith("SET-ME"):
+        sys.exit("No Constant Contact app key yet. Each person needs their own app: create one in the developer portal\n"
+                 "(https://app.constantcontact.com/pages/dma/portal/ -> New Application, PKCE flow, redirect URI\n"
+                 f"{redirect}), put its API key in constant_contact.client_id, then run `cc.py auth`. See SETUP.md step 3.")
     port = urllib.parse.urlparse(redirect).port or 80
     verifier = secrets.token_urlsafe(64)
     challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b"=").decode()
@@ -80,6 +84,11 @@ def cmd_auth(cfg, a):
         if got:
             break
         time.sleep(1)
+    if "not assigned to the client application" in got.get("error_description", ""):
+        sys.exit("Constant Contact refused: this app (client_id in the config) belongs to someone else, and a private\n"
+                 "app only works for the login that created it. Create your own app in the developer portal\n"
+                 "(https://app.constantcontact.com/pages/dma/portal/ -> New Application, PKCE flow, redirect URI\n"
+                 f"{redirect}), put its API key in constant_contact.client_id, and run `cc.py auth` again. See SETUP.md step 3.")
     if got.get("state") != state or "code" not in got:
         sys.exit(f"Sign-in did not complete: {got or 'timed out'}")
     tok = post_form(f"{AUTHZ}/token", {"client_id": cc["client_id"], "redirect_uri": redirect, "code": got["code"],
